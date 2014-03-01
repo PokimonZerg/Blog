@@ -9,9 +9,9 @@ namespace Blog
 {
     public class BlogModel
     {
-        public List<PostList> GetPostList()
+        public List<PostInfo> GetPostInfo()
         {
-            return dataModel.posts.Select(i => new PostList
+            return dataModel.posts.Select(i => new PostInfo
             {
                 Title = i.title,
                 Year = i.date.Year,
@@ -22,7 +22,7 @@ namespace Blog
         BlogDataContext dataModel = new BlogDataContext();
     }
 
-    public class PostList
+    public class PostInfo
     {
         /// <summary>
         /// Short title of post
