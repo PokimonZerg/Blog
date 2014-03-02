@@ -1,21 +1,29 @@
 ﻿/// <reference path="jquery-2.1.0.js" />
 
 /**
+ * Основной класс приложения
+ */
+function Application() {
+
+    this.blogTree = new BlogTree();
+    this.tabPanel = new TabPanel();
+};
+
+function TabPanel() {
+
+};
+
+/**
  * Дерево статей блога. Делит все статьи по годам и месяцам. Выводит их краткие названия.
  * @param {String} data - JSON строка со списками статей
  */
-function BlogTree(data) {
+function BlogTree() {
 
-    // Данные дерева
-    var data = data;
-
-    /**
-     * Собрает дерево по полученной спецификации
-     * @return {String} - html представление дерева
-     */
-    this.build = function () {
-        return buildRoot(data);
-    };
+    (this.refresh = function () {
+        $.getJSON("/Blog/PostTree", function (data) {
+            $(".explorer-content").replaceWith(buildRoot(data));
+        });
+    })();
 
     /**
      * Собирает корень дерева
@@ -62,7 +70,7 @@ function BlogTree(data) {
 
 $(document).ready(function () {
 
-    $.getJSON("/Blog/PostTree", function (data) {
-        $(".explorer-content").append(new BlogTree(data).build());
-    });
+    var application = new Application();
+
+    application.blogTree.refresh();
 });

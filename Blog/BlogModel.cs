@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Blog
 {
-    public class BlogModel
+    public sealed class BlogModel : IDisposable
     {
         public List<PostInfo> GetPostInfo()
         {
@@ -17,6 +17,11 @@ namespace Blog
                 Year = i.date.Year,
                 Month = i.date.Month
             }).ToList();
+        }
+
+        public void Dispose()
+        {
+            dataModel.Dispose();
         }
 
         BlogDataContext dataModel = new BlogDataContext();
