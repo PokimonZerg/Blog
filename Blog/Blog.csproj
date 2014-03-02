@@ -78,6 +78,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Images\collapse.png" />
+    <Content Include="Content\Images\expand.png" />
+    <Content Include="Content\Images\minus.png" />
+    <Content Include="Content\Images\plus.png" />
+    <Content Include="Content\Images\solution.png" />
+    <Content Include="Content\Scripts\script.js" />
+    <Content Include="Content\Styles\style.css" />
     <Content Include="Database\DemoData.sql" />
     <Content Include="Database\Setup.sql" />
     <Content Include="Global.asax" />
@@ -125,10 +132,7 @@
       <DependentUpon>BlogData.dbml</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\Images\" />
-    <Folder Include="Content\Styles\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

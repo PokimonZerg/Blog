@@ -1,0 +1,111 @@
+﻿.window {
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-start;
+    align-items: flex-start;
+
+    margin: 24px auto auto auto;
+
+    border: 1px solid #003366;
+    background-color: #293955;
+
+    width: 100%;
+    max-width: 1280px;
+    min-width: 800px;
+
+    font-family: Consolas, 'Courier New';
+}
+
+.menubar {
+    background-color: #d6dbe9;
+    padding: 5px;
+    flex-basis: 100%;
+    align-self: flex-start;
+}
+
+.menuitem {
+    text-decoration: none;
+    color: black;
+}
+
+.statusbar {
+    background-color: #CA5100;
+    color: white;
+    padding: 2px;
+    height: 24px;
+    line-height: 24px;
+    flex-basis: 100%;
+}
+
+.post {
+    flex-grow: 1;
+    border-left: solid 28px #E6E7E8;
+    margin: 25px 3px 3px 3px;
+    background-color: white;
+}
+
+.explorer {
+    flex-basis: 256px;
+    border: solid 3px #293955;
+    font-size: small;
+    background-color: white;
+    align-self: stretch;
+}
+
+.explorer-head {
+    background-color: #4D6082;
+    color: white;
+    padding: 2px;
+    height: 18px;
+}
+
+.explorer-menu {
+    background-color: #CFD6E5;
+    height: 24px;
+}
+
+.explorer-content {
+    background-color: white;
+}
+
+.tree-container {
+    padding: 0;
+    margin: 0;
+}
+
+.tree-node {
+    list-style-type: none;
+    margin-left: 16px;
+}
+
+.tree-arrow {
+    width: 16px;
+    height: 16px;
+    float: left;
+}
+
+.tree-name {
+    margin-left: 16px;
+    min-height: 16px;
+}
+
+.tree-icon {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+div[data-state=expanded]~ul {
+    display: block;
+}
+
+div[data-state=collapse]~ul {
+    display: none;
+}
+
+div[data-state=expanded] {
+    background-image: url(../images/expand.png);
+}
+
+div[data-state=collapse] {
+    background-image: url(../images/collapse.png);
+}

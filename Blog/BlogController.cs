@@ -12,34 +12,28 @@ namespace Blog
     {
         public ViewResult Index()
         {
+            return View("Index");
+        }
+
+        public JsonResult PostTree()
+        {
             var postInfo = blogModel.GetPostInfo();
 
-            dynamic treeObject = new DynamicJsonObject(new Dictionary<string, object> { 
-                { "name", "SolutionBlog" },
-                { "child", new List<dynamic>() }
-            });
+            dynamic treeObject = new { name = "Solution Blog", child = new List<dynamic>() };
 
-            postInfo.Select(i => i.Year).Distinct().OrderByDescending(i => i).ToList().ForEach(y => 
+            postInfo.Select(i => i.Year).Distinct().OrderByDescending(i => i).ToList().ForEach(y =>
             {
-                dynamic yearObject = new DynamicJsonObject(new Dictionary<string, object> { 
-                    { "name", y },
-                    { "child", new List<dynamic>() }
-                });
-                 
+                dynamic yearObject = new { name = y, child = new List<dynamic>() };
+
                 postInfo.Where(n => n.Year == y).Select(n => n.Month).Distinct().OrderBy(n => n).ToList().ForEach(m =>
                 {
-                    postInfo.Where(k => k.Year == y && k.Month == m).Select(k => k.Title).ToList().ForEach(p =>
-                    {
-                        yearObject.child.Add(new DynamicJsonObject(new Dictionary<string, object> { { "name", p } }));
-                    });
+                    postInfo.Where(k => k.Year == y && k.Month == m).Select(k => k.Title).ToList().ForEach(p => yearObject.child.Add(new { name = p }));
                 });
 
                 treeObject.child.Add(yearObject);
             });
 
-            string json = System.Web.Helpers.Json.Encode(treeObject);
-
-            return View("Index");
+            return Json(treeObject, JsonRequestBehavior.AllowGet);
         }
 
         private BlogModel blogModel = new BlogModel();
