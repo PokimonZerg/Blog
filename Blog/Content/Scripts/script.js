@@ -37,7 +37,7 @@ function TabPanel() {
             tabs.splice(0, 1);
         }
         
-        return tabs[tabs.length - 1].position + 100;
+        return tabs[tabs.length - 1].position + 105;
     }
 
     function Tab(title, position, open, close) {
@@ -49,12 +49,31 @@ function TabPanel() {
         this.tab = $('<div>', { 'class': 'tab', 'text': title });
         this.tab.css({ 'left': position });
         var tab_close = $('<div>', { 'class': 'tab-close' });
+        var thisTab = this;
+
+        tab_close.click(function (event) {
+            var index = tabs.indexOf(thisTab);
+            tabs.splice(index, 1);
+            $(this.parentElement).remove();
+            shiftTabs(index);
+            activateTab(tabs.length == 0 ? null : tabs[0]);
+            thisTab.close();
+        });
 
         this.tab.append(tab_close);
         $('.tab-panel').append(this.tab);
     };
 
+    function shiftTabs(index) {
+        for (var i = index; i < tabs.length; i++) {
+            tabs[i].tab.css({ 'left': tabs[i].position - 105 });
+            tabs[i].position -= 105;
+        }
+    };
+
     function activateTab(tab) {
+        if(tab == null)
+            return activateTab = null;
 
         if (activeTab != null) {
             activeTab.tab.removeClass('tab-selected');
@@ -127,6 +146,6 @@ $(document).ready(function () {
 
     application.blogTree.refresh();
 
-    application.tabPanel.add("test", function () { alert('open') }, function () { alert('close') });
-    application.tabPanel.add("test2", function () { alert('open') }, function () { alert('close') });
+    application.tabPanel.add("test", function () {  }, function () { alert('close') });
+    application.tabPanel.add("test2", function () {  }, function () { alert('close') });
 });

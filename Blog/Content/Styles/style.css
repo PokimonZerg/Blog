@@ -130,10 +130,27 @@ div[data-state=collapse] {
     cursor: default;
 }
 
+.tab:not(.tab-selected):hover {
+    background-color: #5B7199;
+}
+
+.tab:not(.tab-selected):hover > div {
+    background-image: url(../images/close-passive.png);
+}
+
+.tab:not(.tab-selected):hover > div:hover {
+    background-image: url(../images/close-active-focus.png);
+}
+
 .tab-close {
     float: right;
     width: 16px;
     height: 16px;
+    margin-right: 2px;
+}
+
+.tab-close:hover {
+    background-image: url(../images/close-active-focus.png);
 }
 
 .tab-selected {
