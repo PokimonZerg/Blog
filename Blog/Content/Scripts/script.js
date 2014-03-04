@@ -11,6 +11,59 @@ function Application() {
 
 function TabPanel() {
 
+    this.add = function (title, open, close) {
+        var newTab = new Tab(title, calcTabPosition(), open, close);
+        tabs.push(newTab);
+        activateTab(newTab);
+    };
+
+    this.selectTab = function (title) {
+        for (t in tabs) {
+            if (t.title.indexOf(title) != -1)
+                return activateTab(t);
+        }
+    };
+
+    var tabs = new Array();
+    var activeTab = null;
+
+    function calcTabPosition() {
+        // если табов нет, то первый будет расположен в начале
+        if (tabs.length == 0)
+            return 0;
+        // если свобоного места не осталось, то закрываем первый таб
+        if (tabs[tabs.length - 1].position >= $('.post').width()) {
+            tabs[0].close();
+            tabs.splice(0, 1);
+        }
+        
+        return tabs[tabs.length - 1].position + 100;
+    }
+
+    function Tab(title, position, open, close) {
+        this.position = position;
+        this.close = close;
+        this.open = open;
+        this.title = title;
+
+        this.tab = $('<div>', { 'class': 'tab', 'text': title });
+        this.tab.css({ 'left': position });
+        var tab_close = $('<div>', { 'class': 'tab-close' });
+
+        this.tab.append(tab_close);
+        $('.tab-panel').append(this.tab);
+    };
+
+    function activateTab(tab) {
+
+        if (activeTab != null) {
+            activeTab.tab.removeClass('tab-selected');
+        }
+
+        tab.tab.addClass('tab-selected');
+        activeTab = tab;
+        tab.open();
+    };
 };
 
 /**
@@ -73,4 +126,7 @@ $(document).ready(function () {
     var application = new Application();
 
     application.blogTree.refresh();
+
+    application.tabPanel.add("test", function () { alert('open') }, function () { alert('close') });
+    application.tabPanel.add("test2", function () { alert('open') }, function () { alert('close') });
 });
