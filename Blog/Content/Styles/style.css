@@ -124,10 +124,14 @@ li[data-focus=true] {
     width: 100%;
     font-size: small;
     color: white;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .tab {
-    position: absolute;
+    display: inline-block;
+    /*position: absolute;*/
     width: 100px;
     height: 16px;
     background-color: #4D6082;
@@ -148,6 +152,8 @@ li[data-focus=true] {
 }
 
 .tab-close {
+    /*display: inline-block;
+    alig*/
     float: right;
     width: 16px;
     height: 16px;

@@ -26,9 +26,8 @@ function Application() {
 function Tab() {
 
     this.add = function (title) {
-        var newTab = new Tab(title, CalcTabPosition());
+        var newTab = new Tab(title);
         tabs.push(newTab);
-        activateTab(newTab);
     };
 
     this.selectTab = function (title) {
@@ -46,24 +45,10 @@ function Tab() {
     var activeTab = null;
     var onSelect = null;
 
-    function CalcTabPosition() {
-        // если табов нет, то первый будет расположен в начале
-        if (tabs.length == 0)
-            return 0;
-        // если свобоного места не осталось, то закрываем первый таб
-        if (tabs[tabs.length - 1].position + tabs[tabs.length - 1].html.width() * 2 >= $('#post').width()) {
-            RemoveTab(tabs[0]);
-        }
-        
-        return tabs[tabs.length - 1].position + 105;
-    }
-
     function Tab(title, position) {
-        this.position = position;
         this.title = title;
 
-        this.html = $('<div>', { 'class': 'tab', 'text': title });
-        this.html.css({ 'left': position });
+        this.html = $('<li>', { 'class': 'tab', 'text': title });
         var close_button = $('<div>', { 'class': 'tab-close' });
         var self = this;
 
@@ -78,26 +63,20 @@ function Tab() {
 
         this.html.append(close_button);
         $('#tab-panel').append(this.html);
+
+        activateTab(this);
     };
 
     function RemoveTab(tab) {
         var index = tabs.indexOf(tab);
         tabs.splice(index, 1);
         tab.html.remove();
-        shiftTabs(index);
         activateTab(tabs.length == 0 ? null : tabs[0]);
-    };
-
-    function shiftTabs(index) {
-        for (var i = index; i < tabs.length; i++) {
-            tabs[i].html.css({ 'left': tabs[i].position - 105 });
-            tabs[i].position -= 105;
-        }
     };
 
     function activateTab(tab) {
         if(tab == null)
-            return activateTab = null;
+            return null;
 
         if (activeTab != null) {
             activeTab.html.removeClass('tab-selected');
