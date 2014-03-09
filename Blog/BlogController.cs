@@ -15,7 +15,7 @@ namespace Blog
             return View("Index");
         }
 
-        public JsonResult PostTree()
+        public JsonResult Tree()
         {
             var postInfo = blogModel.GetPostInfo();
 
@@ -34,6 +34,11 @@ namespace Blog
             });
 
             return Json(treeObject, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult Post()
+        {
+            return Json("YO!");
         }
 
         private BlogModel blogModel = new BlogModel();

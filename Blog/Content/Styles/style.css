@@ -1,8 +1,11 @@
-﻿.window {
+﻿/*
+ * Common styles
+ */
+main {
     display: flex;
     flex-flow: row wrap;
     align-content: flex-start;
-    align-items: flex-start;
+    align-items: stretch;
 
     margin: 24px auto auto auto;
 
@@ -14,9 +17,16 @@
     min-width: 800px;
 
     font-family: Consolas, 'Courier New';
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-.menubar {
+/*
+ * Menu styles
+ */
+#menubar {
     background-color: #d6dbe9;
     padding: 5px;
     flex-basis: 100%;
@@ -28,24 +38,10 @@
     color: black;
 }
 
-.statusbar {
-    background-color: #CA5100;
-    color: white;
-    padding: 2px;
-    height: 24px;
-    line-height: 24px;
-    flex-basis: 100%;
-}
-
-.post {
-    flex-grow: 1;
-    border-left: solid 28px #E6E7E8;
-    margin: 25px 3px 3px 3px;
-    background-color: white;
-    min-height: 720px;
-}
-
-.explorer {
+/*
+ * Explorer styles
+ */
+#explorer {
     flex-basis: 256px;
     border: solid 3px #293955;
     font-size: small;
@@ -54,30 +50,32 @@
     min-height: 720px;
 }
 
-.explorer-head {
+#explorer-head {
     background-color: #4D6082;
     color: white;
     padding: 2px;
     height: 18px;
 }
 
-.explorer-menu {
+#explorer-menu {
     background-color: #CFD6E5;
     height: 24px;
 }
 
-.explorer-content {
+#explorer-content {
     background-color: white;
 }
 
 .tree-container {
     padding: 0;
     margin: 0;
+    list-style-type: none;
 }
 
 .tree-node {
-    list-style-type: none;
-    margin-left: 16px;
+    position: relative;
+    padding-left: 16px;
+    cursor: default;
 }
 
 .tree-arrow {
@@ -87,7 +85,6 @@
 }
 
 .tree-name {
-    margin-left: 16px;
     min-height: 16px;
 }
 
@@ -96,23 +93,31 @@
     margin-right: 5px;
 }
 
-div[data-state=expanded]~ul {
+li[data-state=expanded] ~ ul {
     display: block;
 }
 
-div[data-state=collapse]~ul {
+li[data-state=collapse] ~ ul {
     display: none;
 }
 
-div[data-state=expanded] {
+li[data-state=expanded] > div.tree-arrow {
     background-image: url(../images/expand.png);
 }
 
-div[data-state=collapse] {
+li[data-state=collapse] > div.tree-arrow {
     background-image: url(../images/collapse.png);
 }
 
-.tab-panel {
+li[data-focus=true] {
+    background-color: #3399FF;
+    color: white;
+}
+
+/*
+ * Tab panel styles
+ */
+#tab-panel {
     position: relative;
     top: -20px;
     left: -28px;
@@ -160,4 +165,33 @@ div[data-state=collapse] {
 
 .tab-selected > div {
     background-image: url(../images/close.png);
+}
+
+/*
+ * Post styles
+ */
+#post {
+    flex-grow: 1;
+    border-left: solid 28px #E6E7E8;
+    margin: 25px 3px 3px 3px;
+    background-color: white;
+    min-height: 720px;
+}
+
+#post-content {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+/*
+ * Status bar styles
+ */
+#statusbar {
+    background-color: #CA5100;
+    color: white;
+    padding: 2px;
+    height: 24px;
+    line-height: 24px;
+    flex-basis: 100%;
 }

@@ -1,23 +1,11 @@
 ﻿use blog
 go
-insert into posts values ('p1', 'post 1', '1-2-2006')
-go
-insert into posts values ('p2', 'post 2', '1-2-2007')
-go
-insert into posts values ('p3', 'post 3', '1-2-2006')
-go
-insert into posts values ('p4', 'post 4', '1-3-2006')
-go
-insert into posts values ('p5', 'post 5', '2-2-2006')
-go
-insert into posts values ('p6', 'post 6', '1-2-2005')
-go
-insert into posts values ('p7', 'post 7', '1-2-2006')
-go
-insert into posts values ('p8', 'post 8', '1-7-2006')
-go
-insert into posts values ('p9', 'post 9', '1-3-2006')
-go
-insert into posts values ('p0', 'post 10', '1-2-2010')
-go
-insert into posts values ('p10', 'post 111', '2-2-2006')
+-- posts data
+insert into posts values ('Post one', 'This is post content.', '1-2-2013')
+insert into posts values ('Post two', 'This is another post content.', '3-2-2014')
+-- users data
+insert into users values ('admin', 'quorum', 'QUORUM', 'admin')
+insert into users values ('sa', 'Aw34esz', 'Acumatica', 'user')
+-- comments data
+insert into comments values (1, 1, 'Comment content')
+insert into comments values (2, 2, 'Another comment');

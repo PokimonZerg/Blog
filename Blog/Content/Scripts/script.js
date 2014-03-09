@@ -5,14 +5,28 @@
  */
 function Application() {
 
-    this.blogTree = new BlogTree();
-    this.tabPanel = new TabPanel();
+    var tree = new Tree();
+    var tab = new Tab();
+    var post = new Post();
+
+    tree.OnSelect(function (item) {
+        tab.add(item);
+    });
+
+    tab.OnSelect(function (item) {
+        post.Show(item);
+    });
+
+    this.Start = function () {
+
+        tree.Refresh();
+    };
 };
 
-function TabPanel() {
+function Tab() {
 
-    this.add = function (title, open, close) {
-        var newTab = new Tab(title, calcTabPosition(), open, close);
+    this.add = function (title) {
+        var newTab = new Tab(title, CalcTabPosition());
         tabs.push(newTab);
         activateTab(newTab);
     };
@@ -24,49 +38,59 @@ function TabPanel() {
         }
     };
 
+    this.OnSelect = function (callback) {
+        onSelect = callback;
+    };
+
     var tabs = new Array();
     var activeTab = null;
+    var onSelect = null;
 
-    function calcTabPosition() {
+    function CalcTabPosition() {
         // если табов нет, то первый будет расположен в начале
         if (tabs.length == 0)
             return 0;
         // если свобоного места не осталось, то закрываем первый таб
-        if (tabs[tabs.length - 1].position >= $('.post').width()) {
-            tabs[0].close();
-            tabs.splice(0, 1);
+        if (tabs[tabs.length - 1].position + tabs[tabs.length - 1].html.width() * 2 >= $('#post').width()) {
+            RemoveTab(tabs[0]);
         }
         
         return tabs[tabs.length - 1].position + 105;
     }
 
-    function Tab(title, position, open, close) {
+    function Tab(title, position) {
         this.position = position;
-        this.close = close;
-        this.open = open;
         this.title = title;
 
-        this.tab = $('<div>', { 'class': 'tab', 'text': title });
-        this.tab.css({ 'left': position });
-        var tab_close = $('<div>', { 'class': 'tab-close' });
-        var thisTab = this;
+        this.html = $('<div>', { 'class': 'tab', 'text': title });
+        this.html.css({ 'left': position });
+        var close_button = $('<div>', { 'class': 'tab-close' });
+        var self = this;
 
-        tab_close.click(function (event) {
-            var index = tabs.indexOf(thisTab);
-            tabs.splice(index, 1);
-            $(this.parentElement).remove();
-            shiftTabs(index);
-            activateTab(tabs.length == 0 ? null : tabs[0]);
-            thisTab.close();
+        this.html.click(function (event) {
+            activateTab(self);
         });
 
-        this.tab.append(tab_close);
-        $('.tab-panel').append(this.tab);
+        close_button.click(function (event) {
+
+            RemoveTab(self);
+        });
+
+        this.html.append(close_button);
+        $('#tab-panel').append(this.html);
+    };
+
+    function RemoveTab(tab) {
+        var index = tabs.indexOf(tab);
+        tabs.splice(index, 1);
+        tab.html.remove();
+        shiftTabs(index);
+        activateTab(tabs.length == 0 ? null : tabs[0]);
     };
 
     function shiftTabs(index) {
         for (var i = index; i < tabs.length; i++) {
-            tabs[i].tab.css({ 'left': tabs[i].position - 105 });
+            tabs[i].html.css({ 'left': tabs[i].position - 105 });
             tabs[i].position -= 105;
         }
     };
@@ -76,67 +100,112 @@ function TabPanel() {
             return activateTab = null;
 
         if (activeTab != null) {
-            activeTab.tab.removeClass('tab-selected');
+            activeTab.html.removeClass('tab-selected');
         }
 
-        tab.tab.addClass('tab-selected');
+        tab.html.addClass('tab-selected');
         activeTab = tab;
-        tab.open();
+
+        onSelect(tab.title);
     };
+};
+
+function Post() {
+    /**
+     * Выводит на экран пост
+     * @param {String} name - имя поста
+     */
+    this.Show = function(name) {
+        /*$.getJSON("/Blog/Post", function (data) {
+
+        });*/
+        $('#post-content').empty();
+        $('#post-content').append(GeneratePost(null));
+    };
+
+    function GeneratePost(data) {
+        var namespace = $('<div>', { 'text': 'namespace Blog' });
+
+        return namespace;
+    };
+
+    var postCash = new Array();
 };
 
 /**
  * Дерево статей блога. Делит все статьи по годам и месяцам. Выводит их краткие названия.
  * @param {String} data - JSON строка со списками статей
  */
-function BlogTree() {
+function Tree() {
 
-    (this.refresh = function () {
-        $.getJSON("/Blog/PostTree", function (data) {
-            $(".explorer-content").replaceWith(buildRoot(data));
+    (this.Refresh = function () {
+        $.getJSON("/Blog/Tree", function (data) {
+            $("#explorer-content").replaceWith(BuildRoot(data));
         });
     })();
+
+    this.OnSelect = function (callback) {
+        onSelect = callback;
+    };
+
+    var onSelect = null;
 
     /**
      * Собирает корень дерева
      * @param {Object} data - данные дерева 
      * @return {Object} - html представление корня дерева
      */
-    function buildRoot(data) {
+    function BuildRoot(data) {
 
-        var root = createSection(data.name, 'tree-arrow', 'content/images/solution.png');
+        var root = CreateSection(data.name, 'tree-arrow', 'content/images/solution.png', 0);
 
-        root.css({ 'margin-left': '-10px', 'margin-top': '7px' });
-
+        root.css({ 'padding-left': '-10px', 'margin-top': '7px' });
         data.child.forEach(function (item) {
-            root.find("li:first").append(createSection(item.name, 'tree-arrow', 'content/images/solution.png'));
+            root.append(CreateSection(item.name, 'tree-arrow', 'content/images/solution.png', 16));
 
-            var lastItem = root.find("li:first").find("li:last");
+            var lastItem = root.find("ul:last");
 
             item.child.forEach(function (childItem) {
+                var section = CreateSection(childItem.name, null, 'content/images/solution.png', 48);
 
-                lastItem.append(createSection(childItem.name, null, 'content/images/solution.png'));
+                section.find('li').dblclick(select_callback);
+
+                lastItem.append(section);
             });
         });
 
         return root;
     };
 
-    function createSection(name, arrow, icon) {
+    function CreateSection(name, arrow, icon, padding) {
         var ul = $('<ul>', { 'class': 'tree-container' });
-        var li = $('<li>', { 'class': 'tree-node' });
-        var arrow = $('<div>', { 'class': arrow, 'data-state': 'expanded' });
+        var li = $('<li>', { 'class': 'tree-node', 'data-focus': false, 'data-state': 'expanded' });
+        var arrow = $('<div>', { 'class': arrow });
         var text = $('<span>', { 'text': name });
         var name = $('<div>', { 'class': 'tree-name' });
         var pic = $('<img>', { 'class': 'tree-icon', 'src': icon });
 
         arrow.click(expand_callback);
+        li.click(activate_callback);
+
+        li.css({ 'padding-left': padding + 'px' });
 
         return ul.append(li.append(arrow).append(name.append(pic).append(text)));
     }
 
     function expand_callback(event) {
-        event.target.setAttribute('data-state', event.target.getAttribute('data-state') == 'expanded' ? 'collapse' : 'expanded');
+        var li = $(event.target).parent('li');
+
+        li.attr('data-state', li.attr('data-state') == 'expanded' ? 'collapse' : 'expanded');
+    };
+
+    function activate_callback(event) {
+        $('#explorer li').attr('data-focus', false);
+        $(this).attr('data-focus', true)
+    };
+
+    function select_callback(event) {
+        onSelect($(event.target).find('span').addBack('span').text());
     };
 };
 
@@ -144,8 +213,5 @@ $(document).ready(function () {
 
     var application = new Application();
 
-    application.blogTree.refresh();
-
-    application.tabPanel.add("test", function () {  }, function () { alert('close') });
-    application.tabPanel.add("test2", function () {  }, function () { alert('close') });
+    application.Start();
 });

@@ -80,6 +80,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Images\close-active-focus.png" />
+    <Content Include="Content\Images\close-passive.png" />
     <Content Include="Content\Images\close.png" />
     <Content Include="Content\Images\collapse.png" />
     <Content Include="Content\Images\expand.png" />
