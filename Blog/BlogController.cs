@@ -10,11 +10,13 @@ namespace Blog
 {
     public class BlogController : Controller
     {
+        [HttpGet]
         public ViewResult Index()
         {
             return View("Index");
         }
 
+        [HttpGet]
         public JsonResult Tree()
         {
             var postInfo = blogModel.GetPostInfo();
@@ -25,10 +27,7 @@ namespace Blog
             {
                 dynamic yearObject = new { name = y, child = new List<dynamic>() };
 
-                postInfo.Where(n => n.Year == y).Select(n => n.Month).Distinct().OrderBy(n => n).ToList().ForEach(m =>
-                {
-                    postInfo.Where(k => k.Year == y && k.Month == m).Select(k => k.Title).ToList().ForEach(p => yearObject.child.Add(new { name = p }));
-                });
+                postInfo.Where(n => n.Year == y).ToList().ForEach(p => yearObject.child.Add(new { name = p.Title, id = p.Id }));
 
                 treeObject.child.Add(yearObject);
             });
@@ -36,9 +35,10 @@ namespace Blog
             return Json(treeObject, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult Post()
+        [HttpGet]
+        public JsonResult Post(int id)
         {
-            return Json("YO!");
+            return Json(blogModel.GetPostContent(id), JsonRequestBehavior.AllowGet);
         }
 
         private BlogModel blogModel = new BlogModel();

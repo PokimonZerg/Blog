@@ -9,12 +9,12 @@ function Application() {
     var tab = new Tab();
     var post = new Post();
 
-    tree.OnSelect(function (item) {
-        tab.add(item);
+    tree.OnSelect(function (name, id) {
+        tab.Add(name, id);
     });
 
-    tab.OnSelect(function (item) {
-        post.Show(item);
+    tab.OnSelect(function (id) {
+        post.Show(id);
     });
 
     this.Start = function () {
@@ -25,8 +25,8 @@ function Application() {
 
 function Tab() {
 
-    this.add = function (title) {
-        var newTab = new Tab(title);
+    this.Add = function (title, id) {
+        var newTab = new Tab(title, id);
         tabs.push(newTab);
     };
 
@@ -45,8 +45,9 @@ function Tab() {
     var activeTab = null;
     var onSelect = null;
 
-    function Tab(title, position) {
+    function Tab(title, id) {
         this.title = title;
+        this.id = id;
 
         this.html = $('<li>', { 'class': 'tab', 'text': title });
         var close_button = $('<div>', { 'class': 'tab-close' });
@@ -85,7 +86,7 @@ function Tab() {
         tab.html.addClass('tab-selected');
         activeTab = tab;
 
-        onSelect(tab.title);
+        onSelect(tab.id);
     };
 };
 
@@ -94,16 +95,15 @@ function Post() {
      * Выводит на экран пост
      * @param {String} name - имя поста
      */
-    this.Show = function(name) {
-        /*$.getJSON("/Blog/Post", function (data) {
-
-        });*/
-        $('#post-content').empty();
-        $('#post-content').append(GeneratePost(null));
+    this.Show = function(id) {
+        $.getJSON("/Blog/Post?id=" + id, function (data) {
+            $('#post-content').empty();
+            $('#post-content').append(GeneratePost(data));
+        });
     };
 
     function GeneratePost(data) {
-        var namespace = $('<div>', { 'text': 'namespace Blog' });
+        var namespace = $('<div>', { 'text': data.Text });
 
         return namespace;
     };
@@ -148,6 +148,7 @@ function Tree() {
                 var section = CreateSection(childItem.name, null, 'content/images/solution.png', 48);
 
                 section.find('li').dblclick(select_callback);
+                section.find('li').attr('data-post-id', childItem.id);
 
                 lastItem.append(section);
             });
@@ -184,7 +185,7 @@ function Tree() {
     };
 
     function select_callback(event) {
-        onSelect($(event.target).find('span').addBack('span').text());
+        onSelect($(this).find('span').text(), $(this).attr('data-post-id'));
     };
 };
 

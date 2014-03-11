@@ -131,7 +131,6 @@ li[data-focus=true] {
 
 .tab {
     display: inline-block;
-    /*position: absolute;*/
     width: 100px;
     height: 16px;
     background-color: #4D6082;
