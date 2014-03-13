@@ -95,20 +95,10 @@ function Post() {
      * Выводит на экран пост
      * @param {String} name - имя поста
      */
-    this.Show = function(id) {
-        $.getJSON("/Blog/Post?id=" + id, function (data) {
-            $('#post-content').empty();
-            $('#post-content').append(GeneratePost(data));
-        });
+    this.Show = function (id) {
+        $('#post-content').empty();
+        $('#post-content').load("/Blog/Post?id=" + id);
     };
-
-    function GeneratePost(data) {
-        var namespace = $('<div>', { 'text': data.Text });
-
-        return namespace;
-    };
-
-    var postCash = new Array();
 };
 
 /**

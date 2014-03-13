@@ -23,6 +23,10 @@ main {
     -ms-user-select: none;
 }
 
+header {
+    display: inline;
+}
+
 /*
  * Menu styles
  */
@@ -151,8 +155,6 @@ li[data-focus=true] {
 }
 
 .tab-close {
-    /*display: inline-block;
-    alig*/
     float: right;
     width: 16px;
     height: 16px;
@@ -187,6 +189,16 @@ li[data-focus=true] {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
+
+    font-family: Consolas;
+
+    position: relative;
+    left: 16px;
+    top: -8px;
+}
+
+.post-keyword {
+    color: #3434FF;
 }
 
 /*
