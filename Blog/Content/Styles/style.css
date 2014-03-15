@@ -42,6 +42,10 @@ header {
     color: black;
 }
 
+#login-link {
+    float: right;
+}
+
 /*
  * Explorer styles
  */
@@ -199,6 +203,10 @@ li[data-focus=true] {
 
 .post-keyword {
     color: #3434FF;
+}
+
+.post-keyword ~ div {
+    margin-left: 24px;
 }
 
 /*

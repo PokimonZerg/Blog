@@ -96,8 +96,25 @@ function Post() {
      * @param {String} name - имя поста
      */
     this.Show = function (id) {
-        $('#post-content').empty();
-        $('#post-content').load("/Blog/Post?id=" + id);
+        $.getJSON("/Blog/Post?id=" + id, function (data) {
+            $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
+                                    '{' +
+                                        '<div>' +
+                                        '<span class="post-keyword">class</span> <header>' + 'no title' + '</header><br />' +
+                                        '{' +
+                                             '<div>' + data.text + '</div>' +
+                                        '}' +
+                                        '</div>' + (function () {
+                                            for (var i = 0, out = ''; i < data.comments.length; i++) {
+                                                out += '<br><div>' +
+                                                        '<span class="post-keyword">class</span> <header>Comment</header><br />' +
+                                                        '{' +
+                                                            '<div>' + data.comments[i].text + '</div>' +
+                                                        '}' +
+                                                        '</div>';
+                                            } return out;
+                                        })() + '}');
+        });
     };
 };
 

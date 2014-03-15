@@ -36,33 +36,13 @@ namespace Blog
         }
 
         [HttpGet]
-        public ActionResult Post(int id)
+        public JsonResult Post(int id)
         {
             var post = blogModel.GetPostContent(id);
 
-            string html = "<span class=\"post-keyword\">namespace</span> Blog<br />" +
-                          "{" +
-                              "<div style=\"margin-left: 24px;\">" +
-                              "<span class=\"post-keyword\">class</span> <header>" + "no title" + "</header><br />" +
-                              "{" +
-                                  "<div style=\"margin-left: 48px;\">" + post.Text + "</div>" +
-                              "}" +
-                              "</div>";
+            dynamic postObject = new { text = post.Text, comments = post.Comments.Select(c => new { text = c.Text }) };
 
-            foreach (var c in post.Comments)
-            {
-                html += "<br />" +
-                        "<div style=\"margin-left: 24px;\">" +
-                        "<span class=\"post-keyword\">class</span> <header>Comment</header><br />" +
-                        "{" +
-                            "<div style=\"margin-left: 48px;\">" + c.Text + "</div>" +
-                        "}" +
-                        "</div>";
-            }
-
-            html += "}";
-
-            return Content(html, "text/html");
+            return Json(postObject, JsonRequestBehavior.AllowGet);
         }
 
         private BlogModel blogModel = new BlogModel();
