@@ -9,10 +9,12 @@ go
 create table users
 (
 	[id] integer primary key identity,
-	[login] varchar(16) not null,
-	[password] varchar(16) not null,
+	[login] varchar(16) null,
+	[password] varchar(16) null,
+	[token] varchar(16) null,
 	[name] nvarchar(32) null,
 	[role] varchar(8) not null,
+	[key] integer null,
 	constraint [role] check([role] in ('admin', 'user'))
 )
 go

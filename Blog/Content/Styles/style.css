@@ -28,6 +28,54 @@ header {
 }
 
 /*
+ * Login styles
+ */
+#login-window {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    margin-left: -128px;
+    width: 256px;
+    height: 320px;
+    background-color: white;
+    border: solid 1px black;
+    z-index: 1;
+}
+
+#login-window-title {
+    background-color: #007ACC;
+    color: white;
+    padding: 3px;
+}
+
+#login-window form {
+    margin-left: 29px;
+    margin-top: 48px;
+}
+
+#login-buttons {
+    width: 196px;
+    text-align: center;
+}
+
+#login-window input {
+    display: block;
+    width: 196px;
+}
+
+#login-window-close-button {
+    display: inline-block;
+    float: right;
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/login-close.png);
+}
+
+#login-window-close-button:hover {
+    background-image: url(../images/login-close-active.png);
+}
+
+/*
  * Menu styles
  */
 #menubar {

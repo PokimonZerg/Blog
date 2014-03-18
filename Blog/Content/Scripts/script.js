@@ -8,6 +8,7 @@ function Application() {
     var tree = new Tree();
     var tab = new Tab();
     var post = new Post();
+    var user = new User();
 
     tree.OnSelect(function (name, id) {
         tab.Add(name, id);
@@ -19,9 +20,63 @@ function Application() {
 
     this.Start = function () {
 
+        $('#login-link').click(user.Login);
+
         tree.Refresh();
     };
 };
+
+function User() {
+
+    this.Login = function () {
+        var key = GetOldKey();
+
+        if (key)
+            return $('#login-link').text('USER ("' + GetUserName(key) + '")');
+
+        ShowLoginForm(function (key) {
+        });
+    };
+
+    function ShowLoginForm(callback) {
+        var loginForm = $('<div id="login-window"></div>').html(
+                '<div id="login-window-title">Login or Register' +
+                '<div id="login-window-close-button"></div>' +
+                '</div>' +
+                '<form id="login-form">' +
+                'Login: <input type="text" name="login">' +
+                'Password: <input type="text" name="password">' + 
+                '<br><div id="login-buttons">' +
+                '<button class="register-button">Register</button> ' +
+                '<button class="login-button">Login</button>' +
+                '<br><br><br><div id="login-google"></div></div>' +
+                '</form>');
+
+        loginForm.find('#login-window-close-button').click(CloseLoginWindow);
+
+        $('main').prepend(loginForm);
+
+        gapi.signin.render('login-google', {
+            'clientid': 'CLIENT_ID',
+            'scope': 'https://www.googleapis.com/auth/plus.login',
+            'requestvisibleactions': 'http://schemas.google.com/AddActivity',
+            'cookiepolicy': 'single_host_origin',
+            'callback': 'signinCallback'
+        });
+    };
+
+    function CloseLoginWindow() {
+        $('#login-window').remove();
+    };
+
+    function GetUserName(key) {
+        return "cglbftm";
+    };
+    
+    function GetOldKey() {
+        return null;
+    };
+}
 
 function Tab() {
 
