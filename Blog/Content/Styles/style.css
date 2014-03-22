@@ -28,6 +28,17 @@ header {
 }
 
 /*
+ * Users and roles
+ */
+.admin {
+    display: none;
+}
+
+.user {
+    display: none;
+}
+
+/*
  * Login styles
  */
 #login-window {
@@ -54,6 +65,7 @@ header {
 }
 
 #login-buttons {
+    margin-left: 29px;
     width: 196px;
     text-align: center;
 }
@@ -73,6 +85,11 @@ header {
 
 #login-window-close-button:hover {
     background-image: url(../images/login-close-active.png);
+}
+
+#login-info-block {
+    color: red;
+    font-size: small;
 }
 
 /*

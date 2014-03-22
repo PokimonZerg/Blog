@@ -9,24 +9,25 @@
       <Association Name="post_comment" Member="comments" ThisKey="id" OtherKey="post" Type="comment" />
     </Type>
   </Table>
-  <Table Name="dbo.users" Member="users">
-    <Type Name="user">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="login" Type="System.String" DbType="VarChar(16) NOT NULL" CanBeNull="false" />
-      <Column Name="password" Type="System.String" DbType="VarChar(16) NOT NULL" CanBeNull="false" />
-      <Column Name="name" Type="System.String" DbType="NVarChar(32)" CanBeNull="true" />
-      <Column Name="role" Type="System.String" DbType="VarChar(8) NOT NULL" CanBeNull="false" />
-      <Association Name="user_comment" Member="comments" ThisKey="id" OtherKey="author" Type="comment" />
-    </Type>
-  </Table>
   <Table Name="dbo.comments" Member="comments">
     <Type Name="comment">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
       <Column Name="post" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="author" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="text" Type="System.String" DbType="NVarChar(2048) NOT NULL" CanBeNull="false" />
-      <Association Name="user_comment" Member="user" ThisKey="author" OtherKey="id" Type="user" IsForeignKey="true" />
       <Association Name="post_comment" Member="post1" ThisKey="post" OtherKey="id" Type="post" IsForeignKey="true" />
+      <Association Name="user_comment" Member="user" ThisKey="author" OtherKey="id" Type="user" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.users" Member="users">
+    <Type Name="user">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="login" Type="System.String" DbType="VarChar(16)" CanBeNull="true" />
+      <Column Name="password" Type="System.String" DbType="VarChar(16)" CanBeNull="true" />
+      <Column Name="token" Type="System.String" DbType="VarChar(16)" CanBeNull="true" />
+      <Column Name="role" Type="System.String" DbType="VarChar(8) NOT NULL" CanBeNull="false" />
+      <Column Name="[key]" Member="key" Type="System.String" DbType="Char(40) NOT NULL" CanBeNull="false" />
+      <Association Name="user_comment" Member="comments" ThisKey="id" OtherKey="author" Type="comment" />
     </Type>
   </Table>
 </Database>

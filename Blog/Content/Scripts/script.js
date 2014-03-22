@@ -20,39 +20,70 @@ function Application() {
 
     this.Start = function () {
 
-        $('#login-link').click(user.Login);
-
         tree.Refresh();
+
+        user.Authorize();
     };
 };
 
 function User() {
 
     this.Login = function () {
-        var key = GetOldKey();
 
-        if (key)
-            return $('#login-link').text('USER ("' + GetUserName(key) + '")');
+        if ($('#login-link').text().indexOf('USER') != -1) {
+            window.localStorage.removeItem('key');
+            $('#login-link').text('LOGIN');
+            return self.Authorize(null);
+        }
 
-        ShowLoginForm(function (key) {
-        });
+        if (!self.Authorize())
+            ShowLoginForm();
     };
 
-    function ShowLoginForm(callback) {
+    this.Authorize = function () {
+
+        var key = window.localStorage.getItem('key');
+
+        if (key == null) {
+            $('.admin').css({ display: "none" });
+            $('.user').css({ display: "none" });
+            return false;
+        }
+        else {
+            $.getJSON('/Blog/UserInfo?key=' + key, function (data) {
+
+                $('#login-link').text('USER: ' + data.name);
+
+                if (data.role.indexOf('admin') != -1) {
+                    $('.admin').css({ display: "inline-block" });
+                }
+
+                if (data.role.indexOf('admin') != -1 || data.role.indexOf('admin') != -1) {
+                    $('.user').css({ display: "inline-block" });
+                }
+            });
+
+            return true;
+        }
+    };
+
+    function ShowLoginForm() {
         var loginForm = $('<div id="login-window"></div>').html(
                 '<div id="login-window-title">Login or Register' +
                 '<div id="login-window-close-button"></div>' +
                 '</div>' +
                 '<form id="login-form">' +
                 'Login: <input type="text" name="login">' +
-                'Password: <input type="text" name="password">' + 
+                'Password: <input type="text" name="password"></form>' + 
                 '<br><div id="login-buttons">' +
                 '<button class="register-button">Register</button> ' +
                 '<button class="login-button">Login</button>' +
-                '<br><br><br><div id="login-google"></div></div>' +
-                '</form>');
+                '<br><br><br><div id="login-google"></div>' +
+                '<br><div id="login-info-block"></div></div>');
 
-        loginForm.find('#login-window-close-button').click(CloseLoginWindow);
+        loginForm.find('#login-window-close-button').click(function () { $('#login-window').remove(); });
+        loginForm.find('.register-button').click(function () { LoginRequest('Register') });
+        loginForm.find('.login-button').click(function () { LoginRequest('Login') });
 
         $('main').prepend(loginForm);
 
@@ -61,21 +92,34 @@ function User() {
             'scope': 'https://www.googleapis.com/auth/plus.login',
             'requestvisibleactions': 'http://schemas.google.com/AddActivity',
             'cookiepolicy': 'single_host_origin',
-            'callback': 'signinCallback'
+            'callback': 'GoogleCallback'
         });
     };
 
-    function CloseLoginWindow() {
-        $('#login-window').remove();
+    function GoogleCallback(authResult) {
+        var g = 0;
     };
 
-    function GetUserName(key) {
-        return "cglbftm";
+    function LoginRequest(target) {
+        $.getJSON('/Blog/' + target, {
+            "login": $('#login-form > input[name="login"]').val(),
+            "password": $('#login-form > input[name="password"]').val()
+        },
+        function (data) {
+
+            if (!data.result)
+                return $('#login-info-block').text(data.message);
+
+            window.localStorage.setItem('key', data.key);
+
+            self.Authorize();
+            $('#login-window').remove();
+        });
     };
-    
-    function GetOldKey() {
-        return null;
-    };
+
+    $('#login-link').click(this.Login);
+
+    var self = this;
 }
 
 function Tab() {

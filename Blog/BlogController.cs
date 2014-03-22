@@ -45,6 +45,91 @@ namespace Blog
             return Json(postObject, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult Register(string login, string password)
+        {
+            try
+            {
+                if (blogModel.IsUserExist(login, password))
+                {
+                    return Json(new LoginInfo(false, "", "User already exist"), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    string key = blogModel.AddUser(login, password);
+
+                    return Json(new LoginInfo(true, key, ""), JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception e)
+            {
+                return Json(new LoginInfo(false, "", "Fatal error: " + e.Message), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult Login(string login, string password)
+        {
+            try
+            {
+                if (!blogModel.IsUserExist(login, password))
+                {
+                    return Json(new LoginInfo(false, "", "No users with name '" + login + "'"), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new LoginInfo(true, blogModel.GetUserKey(login, password), ""), JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception e)
+            {
+                return Json(new LoginInfo(false, "", "Fatal error: " + e.Message), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult UserInfo(string key)
+        {
+            var userInfo = blogModel.GetUserInfo(key);
+
+            return Json(new { name = userInfo.Name, role = userInfo.Role }, JsonRequestBehavior.AllowGet);
+        }
+
         private BlogModel blogModel = new BlogModel();
+
+        class LoginInfo
+        {
+            public LoginInfo()
+            {
+                result = false;
+                key = "";
+                message = "";
+            }
+
+            public LoginInfo(bool result, string key, string message = "")
+            {
+                this.result = result;
+                this.key = key;
+                this.message = message;
+            }
+
+            public bool result
+            {
+                get;
+                set;
+            }
+
+            public string key
+            {
+                get;
+                set;
+            }
+
+            public string message
+            {
+                get;
+                set;
+            }
+        }
     }
 }

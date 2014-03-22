@@ -32,12 +32,57 @@ namespace Blog
             };
         }
 
+        public bool IsUserExist(string login, string password)
+        {
+            return dataModel.users.Where(u => u.login.Equals(login) && u.password.Equals(password)).Count() != 0;
+        }
+
+        public string GetUserKey(string login, string password)
+        {
+            return dataModel.users.Where(u => u.login.Equals(login) && u.password.Equals(password)).First().key;
+        }
+
+        public UserInfo GetUserInfo(string key)
+        {
+            return dataModel.users.Where(u => u.key.Equals(key)).Select(f => new UserInfo { Name = f.login, Role = f.role }).First();
+        }
+
+        public string AddUser(string login, string password)
+        {
+            string newKey = Guid.NewGuid().ToString();
+
+            dataModel.users.InsertOnSubmit(new user {
+                login = login,
+                password = password,
+                token = null,
+                key = newKey,
+                role = "user" 
+            });
+
+            dataModel.SubmitChanges();
+
+            return newKey;
+        }
+
         public void Dispose()
         {
             dataModel.Dispose();
         }
 
         BlogDataContext dataModel = new BlogDataContext();
+    }
+
+    public class UserInfo
+    {
+        /// <summary>
+        /// User name (login)
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// User role (admin, user)
+        /// </summary>
+        public string Role { get; set; }
     }
 
     public class PostContent
