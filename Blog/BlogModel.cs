@@ -14,22 +14,31 @@ namespace Blog
             return dataModel.posts.Select(i => new PostInfo
             {
                 Id = i.id,
-                Title = i.title,
+                Title = i.short_title,
                 Year = i.date.Year,
             }).ToList();
         }
 
         public PostContent GetPostContent(int id)
         {
-            return new PostContent()
-            {
-                Text = dataModel.posts.First(t => (int)t.id == id).text,
+            return dataModel.posts.Where(p => (int)p.id == id).Select(s => new PostContent() {
+                ShortTitle = s.short_title,
+                Title = s.title,
+                Text = s.text,
+
                 Comments = dataModel.comments.Join(dataModel.posts, c => c.post, p => p.id, (c, p) => new Comment() { 
                     Text = c.text, 
                     Author = "author", 
                     Date = new DateTime() 
                 }).ToList()
-            };
+            }).First();
+        }
+
+        public void SavePost(string short_title, string title, string text)
+        {
+            dataModel.posts.InsertOnSubmit(new post { short_title = short_title, title = title, text = text, date = DateTime.Now });
+
+            dataModel.SubmitChanges();
         }
 
         public bool IsUserExist(string login, string password)
@@ -87,6 +96,16 @@ namespace Blog
 
     public class PostContent
     {
+        /// <summary>
+        /// Short title
+        /// </summary>
+        public string ShortTitle { get; set; }
+
+        /// <summary>
+        /// Post title
+        /// </summary>
+        public string Title { get; set; }
+
         /// <summary>
         /// Text content of the post
         /// </summary>

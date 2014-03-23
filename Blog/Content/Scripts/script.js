@@ -6,9 +6,10 @@
 function Application() {
 
     var tree = new Tree();
-    var tab = new Tab();
+    var tab  = new Tab();
     var post = new Post();
     var user = new User();
+    var menu = new Menu();
 
     tree.OnSelect(function (name, id) {
         tab.Add(name, id);
@@ -18,12 +19,29 @@ function Application() {
         post.Show(id);
     });
 
+    menu.OnNew(function () {
+        tab.Add('New Post', post.NewPostId);
+    });
+
+    post.OnPreview(function () {
+        tab.Add('Preview', post.PreviewId);
+    });
+
     this.Start = function () {
 
         tree.Refresh();
 
         user.Authorize();
     };
+};
+
+function Menu() {
+
+    this.OnNew = function (callback) {
+        $('#new-link').click(callback);
+    };
+
+    var self = this;
 };
 
 function User() {
@@ -190,16 +208,41 @@ function Tab() {
 };
 
 function Post() {
+
+    this.OnPreview = function (callback) {
+        previewCallback = callback;
+    };
+
     /**
      * Выводит на экран пост
      * @param {String} name - имя поста
      */
     this.Show = function (id) {
+
+        // save post data
+        if ($('#editor').length != 0) {
+            postData.shortTitle = $('#editor input[name="short-title"]').val();
+            postData.title = $('#editor input[name="full-title"]').val();
+            postData.text = $('#editor-area').val();
+        }
+
+        if (id == this.NewPostId)
+            return this.New();
+
+        if (id == this.PreviewId) {
+            if ($('#editor').length == 0) return;
+
+            return this.Preview({
+                "title": $('#editor input[name="full-title"]').val(),
+                "text": $('#editor-area').val()
+            });
+        }
+
         $.getJSON("/Blog/Post?id=" + id, function (data) {
             $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
                                     '{' +
                                         '<div>' +
-                                        '<span class="post-keyword">class</span> <header>' + 'no title' + '</header><br />' +
+                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br />' +
                                         '{' +
                                              '<div>' + data.text + '</div>' +
                                         '}' +
@@ -215,6 +258,64 @@ function Post() {
                                         })() + '}');
         });
     };
+
+    this.Preview = function (data) {
+        $.post("/Blog/Preview", data, function (data) {
+            $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
+                                    '{' +
+                                        '<div>' +
+                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br />' +
+                                        '{' +
+                                             '<div>' + data.text + '</div>' +
+                                        '}' +
+                                        '</div>' + (function () {
+                                            for (var i = 0, out = ''; i < data.comments.length; i++) {
+                                                out += '<br><div>' +
+                                                        '<span class="post-keyword">class</span> <header>Comment</header><br />' +
+                                                        '{' +
+                                                            '<div>' + data.comments[i].text + '</div>' +
+                                                        '}' +
+                                                        '</div>';
+                                            } return out;
+                                        })() + '}');
+        }, 'json');
+    };
+
+    this.New = function () {
+        $('#post-content').html(
+            '<form id="editor">' +
+            'Short title: <input type="text" name="short-title">' +
+            'Full title: <input type="text" name="full-title">' +
+            'Post content: <textarea id="editor-area"></textarea>' + 
+            '</form><br>' +
+            '<button id="editor-save">Save</button> ' +
+            '<button id="editor-preview">Preview</button>'
+          );
+
+        $('#editor-save').click(function () {
+            $.post("/Blog/SavePost", {
+                "short_title": $('#editor input[name="short-title"]').val(),
+                "title": $('#editor input[name="full-title"]').val(),
+                "text": $('#editor-area').val()
+            }, function (data) {
+                alert(data.result ? 'Post saved' : 'Error while saving post: ' + data.message)
+            }, 'json');
+        });
+
+        $('#editor-preview').click(previewCallback);
+
+        // restore data
+        $('#editor input[name="short-title"]').val(postData.shortTitle);
+        $('#editor input[name="full-title"]').val(postData.title);
+        $('#editor-area').val(postData.text);
+    };
+
+    this.NewPostId = 99999;
+    this.PreviewId = 99998;
+
+    var previewCallback = null;
+    var postData = { shortTitle: "", title: "", text: "" };
+    var self = this;
 };
 
 /**

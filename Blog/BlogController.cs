@@ -40,9 +40,34 @@ namespace Blog
         {
             var post = blogModel.GetPostContent(id);
 
-            dynamic postObject = new { text = post.Text, comments = post.Comments.Select(c => new { text = c.Text }) };
+            dynamic postObject = new { text = post.Text, title = post.Title, comments = post.Comments.Select(c => new { text = c.Text }) };
 
             return Json(postObject, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public JsonResult Preview(string title, string text)
+        {
+            dynamic postObject = new { text = text, title = title, comments = new List<Comment>() };
+
+            return Json(postObject);
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public JsonResult SavePost(string short_title, string title, string text)
+        {
+            try
+            {
+                blogModel.SavePost(short_title, title, text);
+            }
+            catch(Exception e)
+            {
+                return Json(new { result = false, message = e.Message });
+            }
+
+            return Json(new { result = true, message = "" });
         }
 
         [HttpGet]

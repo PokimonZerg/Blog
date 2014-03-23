@@ -30,15 +30,15 @@ namespace Blog
 		
     #region Extensibility Method Definitions
     partial void OnCreated();
-    partial void Insertpost(post instance);
-    partial void Updatepost(post instance);
-    partial void Deletepost(post instance);
     partial void Insertcomment(comment instance);
     partial void Updatecomment(comment instance);
     partial void Deletecomment(comment instance);
     partial void Insertuser(user instance);
     partial void Updateuser(user instance);
     partial void Deleteuser(user instance);
+    partial void Insertpost(post instance);
+    partial void Updatepost(post instance);
+    partial void Deletepost(post instance);
     #endregion
 		
 		public BlogDataContext() : 
@@ -71,14 +71,6 @@ namespace Blog
 			OnCreated();
 		}
 		
-		public System.Data.Linq.Table<post> posts
-		{
-			get
-			{
-				return this.GetTable<post>();
-			}
-		}
-		
 		public System.Data.Linq.Table<comment> comments
 		{
 			get
@@ -94,167 +86,13 @@ namespace Blog
 				return this.GetTable<user>();
 			}
 		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.posts")]
-	public partial class post : INotifyPropertyChanging, INotifyPropertyChanged
-	{
 		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _title;
-		
-		private string _text;
-		
-		private System.DateTime _date;
-		
-		private EntitySet<comment> _comments;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OntitleChanging(string value);
-    partial void OntitleChanged();
-    partial void OntextChanging(string value);
-    partial void OntextChanged();
-    partial void OndateChanging(System.DateTime value);
-    partial void OndateChanged();
-    #endregion
-		
-		public post()
-		{
-			this._comments = new EntitySet<comment>(new Action<comment>(this.attach_comments), new Action<comment>(this.detach_comments));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
+		public System.Data.Linq.Table<post> posts
 		{
 			get
 			{
-				return this._id;
+				return this.GetTable<post>();
 			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="NVarChar(32) NOT NULL", CanBeNull=false)]
-		public string title
-		{
-			get
-			{
-				return this._title;
-			}
-			set
-			{
-				if ((this._title != value))
-				{
-					this.OntitleChanging(value);
-					this.SendPropertyChanging();
-					this._title = value;
-					this.SendPropertyChanged("title");
-					this.OntitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_text", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
-		public string text
-		{
-			get
-			{
-				return this._text;
-			}
-			set
-			{
-				if ((this._text != value))
-				{
-					this.OntextChanging(value);
-					this.SendPropertyChanging();
-					this._text = value;
-					this.SendPropertyChanged("text");
-					this.OntextChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
-		public System.DateTime date
-		{
-			get
-			{
-				return this._date;
-			}
-			set
-			{
-				if ((this._date != value))
-				{
-					this.OndateChanging(value);
-					this.SendPropertyChanging();
-					this._date = value;
-					this.SendPropertyChanged("date");
-					this.OndateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="post_comment", Storage="_comments", ThisKey="id", OtherKey="post")]
-		public EntitySet<comment> comments
-		{
-			get
-			{
-				return this._comments;
-			}
-			set
-			{
-				this._comments.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_comments(comment entity)
-		{
-			this.SendPropertyChanging();
-			entity.post1 = this;
-		}
-		
-		private void detach_comments(comment entity)
-		{
-			this.SendPropertyChanging();
-			entity.post1 = null;
 		}
 	}
 	
@@ -272,9 +110,9 @@ namespace Blog
 		
 		private string _text;
 		
-		private EntityRef<post> _post1;
-		
 		private EntityRef<user> _user;
+		
+		private EntityRef<post> _post1;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -292,8 +130,8 @@ namespace Blog
 		
 		public comment()
 		{
-			this._post1 = default(EntityRef<post>);
 			this._user = default(EntityRef<user>);
+			this._post1 = default(EntityRef<post>);
 			OnCreated();
 		}
 		
@@ -385,40 +223,6 @@ namespace Blog
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="post_comment", Storage="_post1", ThisKey="post", OtherKey="id", IsForeignKey=true)]
-		public post post1
-		{
-			get
-			{
-				return this._post1.Entity;
-			}
-			set
-			{
-				post previousValue = this._post1.Entity;
-				if (((previousValue != value) 
-							|| (this._post1.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._post1.Entity = null;
-						previousValue.comments.Remove(this);
-					}
-					this._post1.Entity = value;
-					if ((value != null))
-					{
-						value.comments.Add(this);
-						this._post = value.id;
-					}
-					else
-					{
-						this._post = default(Nullable<int>);
-					}
-					this.SendPropertyChanged("post1");
-				}
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="user_comment", Storage="_user", ThisKey="author", OtherKey="id", IsForeignKey=true)]
 		public user user
 		{
@@ -449,6 +253,40 @@ namespace Blog
 						this._author = default(Nullable<int>);
 					}
 					this.SendPropertyChanged("user");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="post_comment", Storage="_post1", ThisKey="post", OtherKey="id", IsForeignKey=true)]
+		public post post1
+		{
+			get
+			{
+				return this._post1.Entity;
+			}
+			set
+			{
+				post previousValue = this._post1.Entity;
+				if (((previousValue != value) 
+							|| (this._post1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._post1.Entity = null;
+						previousValue.comments.Remove(this);
+					}
+					this._post1.Entity = value;
+					if ((value != null))
+					{
+						value.comments.Add(this);
+						this._post = value.id;
+					}
+					else
+					{
+						this._post = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("post1");
 				}
 			}
 		}
@@ -681,6 +519,192 @@ namespace Blog
 		{
 			this.SendPropertyChanging();
 			entity.user = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.posts")]
+	public partial class post : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _short_title;
+		
+		private string _title;
+		
+		private string _text;
+		
+		private System.DateTime _date;
+		
+		private EntitySet<comment> _comments;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void Onshort_titleChanging(string value);
+    partial void Onshort_titleChanged();
+    partial void OntitleChanging(string value);
+    partial void OntitleChanged();
+    partial void OntextChanging(string value);
+    partial void OntextChanged();
+    partial void OndateChanging(System.DateTime value);
+    partial void OndateChanged();
+    #endregion
+		
+		public post()
+		{
+			this._comments = new EntitySet<comment>(new Action<comment>(this.attach_comments), new Action<comment>(this.detach_comments));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_short_title", DbType="NVarChar(16) NOT NULL", CanBeNull=false)]
+		public string short_title
+		{
+			get
+			{
+				return this._short_title;
+			}
+			set
+			{
+				if ((this._short_title != value))
+				{
+					this.Onshort_titleChanging(value);
+					this.SendPropertyChanging();
+					this._short_title = value;
+					this.SendPropertyChanged("short_title");
+					this.Onshort_titleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_title", DbType="NVarChar(128) NOT NULL", CanBeNull=false)]
+		public string title
+		{
+			get
+			{
+				return this._title;
+			}
+			set
+			{
+				if ((this._title != value))
+				{
+					this.OntitleChanging(value);
+					this.SendPropertyChanging();
+					this._title = value;
+					this.SendPropertyChanged("title");
+					this.OntitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_text", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
+		public string text
+		{
+			get
+			{
+				return this._text;
+			}
+			set
+			{
+				if ((this._text != value))
+				{
+					this.OntextChanging(value);
+					this.SendPropertyChanging();
+					this._text = value;
+					this.SendPropertyChanged("text");
+					this.OntextChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_date", DbType="DateTime NOT NULL")]
+		public System.DateTime date
+		{
+			get
+			{
+				return this._date;
+			}
+			set
+			{
+				if ((this._date != value))
+				{
+					this.OndateChanging(value);
+					this.SendPropertyChanging();
+					this._date = value;
+					this.SendPropertyChanged("date");
+					this.OndateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="post_comment", Storage="_comments", ThisKey="id", OtherKey="post")]
+		public EntitySet<comment> comments
+		{
+			get
+			{
+				return this._comments;
+			}
+			set
+			{
+				this._comments.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_comments(comment entity)
+		{
+			this.SendPropertyChanging();
+			entity.post1 = this;
+		}
+		
+		private void detach_comments(comment entity)
+		{
+			this.SendPropertyChanging();
+			entity.post1 = null;
 		}
 	}
 }

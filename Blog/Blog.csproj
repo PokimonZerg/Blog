@@ -124,6 +124,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\Scripts\jquery-2.1.0.min.map" />
+    <None Include="Properties\PublishProfiles\mvc5blog - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\mvc5blog - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

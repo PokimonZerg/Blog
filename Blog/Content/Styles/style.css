@@ -39,6 +39,26 @@ header {
 }
 
 /*
+ * Editor and Preview
+ */
+#editor > input, textarea {
+    display: block;
+}
+
+#editor-area {
+    width: 800px;
+    height: 600px;
+}
+
+#editor input[name="short-title"] {
+    width: 128px;
+}
+
+#editor input[name="full-title"] {
+    width: 256px;
+}
+
+/*
  * Login styles
  */
 #login-window {
