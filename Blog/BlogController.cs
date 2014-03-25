@@ -17,6 +17,7 @@ namespace Blog
         }
 
         [HttpGet]
+        [OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)]
         public JsonResult Tree()
         {
             var postInfo = blogModel.GetPostInfo();
@@ -56,10 +57,11 @@ namespace Blog
 
         [HttpPost]
         [ValidateInput(false)]
-        public JsonResult SavePost(string short_title, string title, string text)
+        public JsonResult SavePost(string short_title, string title, string text, string key)
         {
             try
             {
+                blogModel.CheckUserRole(new[] { "admin" }, key);
                 blogModel.SavePost(short_title, title, text);
             }
             catch(Exception e)

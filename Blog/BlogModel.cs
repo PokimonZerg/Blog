@@ -26,7 +26,7 @@ namespace Blog
                 Title = s.title,
                 Text = s.text,
 
-                Comments = dataModel.comments.Join(dataModel.posts, c => c.post, p => p.id, (c, p) => new Comment() { 
+                Comments = dataModel.comments.Where(c => c.post == id).Select(c => new Comment() { 
                     Text = c.text, 
                     Author = "author", 
                     Date = new DateTime() 
@@ -49,6 +49,16 @@ namespace Blog
         public string GetUserKey(string login, string password)
         {
             return dataModel.users.Where(u => u.login.Equals(login) && u.password.Equals(password)).First().key;
+        }
+
+        public void CheckUserRole(string[] roles, string key)
+        {
+            var role = dataModel.users.First(u => u.key.Equals(key)).role;
+
+            foreach (var r in roles)
+                if (r == role) return;
+
+            throw new Exception("Security alert! User role must be " + (roles.Length > 1 ? "<SPLIT>" : roles[0]));
         }
 
         public UserInfo GetUserInfo(string key)

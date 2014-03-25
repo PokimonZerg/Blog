@@ -155,6 +155,19 @@ header {
     height: 24px;
 }
 
+#explorer-menu-refresh {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 3px;
+    left: 3px;
+    background-image: url(../images/refresh.png);
+}
+
+#explorer-menu-refresh:hover {
+    background-image: url(../images/refresh-active.png);
+}
+
 #explorer-content {
     background-color: white;
 }
@@ -224,7 +237,7 @@ li[data-focus=true] {
 
 .tab {
     display: inline-block;
-    width: 100px;
+    width: 119px;
     height: 16px;
     background-color: #4D6082;
     padding: 2px;

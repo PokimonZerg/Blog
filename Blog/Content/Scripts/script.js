@@ -19,6 +19,10 @@ function Application() {
         post.Show(id);
     });
 
+    tab.OnClose(function () {
+        post.Clear();
+    });
+
     menu.OnNew(function () {
         tab.Add('New Post', post.NewPostId);
     });
@@ -56,6 +60,10 @@ function User() {
 
         if (!self.Authorize())
             ShowLoginForm();
+    };
+
+    this.GetKey = function () {
+        return window.localStorage.getItem('key');
     };
 
     this.Authorize = function () {
@@ -158,9 +166,14 @@ function Tab() {
         onSelect = callback;
     };
 
+    this.OnClose = function (callback) {
+        onClose = callback;
+    };
+
     var tabs = new Array();
     var activeTab = null;
     var onSelect = null;
+    var onClose = null;
 
     function Tab(title, id) {
         this.title = title;
@@ -175,11 +188,17 @@ function Tab() {
         });
 
         close_button.click(function (event) {
-
+            onClose();
             RemoveTab(self);
         });
 
         this.html.append(close_button);
+        // check for tab panel overflow
+        if ($('#tab-panel').find('li').length > 1) {
+            if ($('#tab-panel li').first().width() * ($('#tab-panel').find('li').length + 1) > $('#tab-panel').width())
+                RemoveTab(tabs[0]);
+        }
+
         $('#tab-panel').append(this.html);
 
         activateTab(this);
@@ -211,6 +230,10 @@ function Post() {
 
     this.OnPreview = function (callback) {
         previewCallback = callback;
+    };
+
+    this.Clear = function () {
+        $('#post-content').empty();
     };
 
     /**
@@ -296,7 +319,8 @@ function Post() {
             $.post("/Blog/SavePost", {
                 "short_title": $('#editor input[name="short-title"]').val(),
                 "title": $('#editor input[name="full-title"]').val(),
-                "text": $('#editor-area').val()
+                "text": $('#editor-area').val(),
+                "key": window.localStorage.getItem('key')
             }, function (data) {
                 alert(data.result ? 'Post saved' : 'Error while saving post: ' + data.message)
             }, 'json');
@@ -324,17 +348,25 @@ function Post() {
  */
 function Tree() {
 
-    (this.Refresh = function () {
+    this.Refresh = function () {
         $.getJSON("/Blog/Tree", function (data) {
-            $("#explorer-content").replaceWith(BuildRoot(data));
+            $("#explorer-content").empty();
+            $("#explorer-content").append(BuildRoot(data));
         });
-    })();
+    };
+    
+    this.Refresh();
+    this.Refresh();
 
     this.OnSelect = function (callback) {
         onSelect = callback;
     };
 
     var onSelect = null;
+
+    var self = this;
+
+    $('#explorer-menu-refresh').click(self.Refresh);
 
     /**
      * Собирает корень дерева
