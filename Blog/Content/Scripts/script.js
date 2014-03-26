@@ -66,13 +66,29 @@ function User() {
         return window.localStorage.getItem('key');
     };
 
+    function SetRules(admin, user) {
+        var rules = document.styleSheets[0].cssRules;
+
+        var deleteRule = function (rule) {
+            for (var i = 0; i < rules.length; i++) {
+                if (rules[i].selectorText.indexOf(rule) != -1) 
+                    return document.styleSheets[0].deleteRule(i);
+            }
+        }
+
+        deleteRule('admin');
+        deleteRule('user');
+
+        document.styleSheets[0].insertRule(admin, document.styleSheets[0].cssRules.length);
+        document.styleSheets[0].insertRule(user, document.styleSheets[0].cssRules.length);
+    };
+
     this.Authorize = function () {
 
         var key = window.localStorage.getItem('key');
 
         if (key == null) {
-            $('.admin').css({ display: "none" });
-            $('.user').css({ display: "none" });
+            SetRules('.admin { display: none; }', '.user { display: none; }');
             return false;
         }
         else {
@@ -81,11 +97,11 @@ function User() {
                 $('#login-link').text('USER: ' + data.name);
 
                 if (data.role.indexOf('admin') != -1) {
-                    $('.admin').css({ display: "inline-block" });
+                    SetRules('.admin { display: inline-block; }', '.user { display: inline-block; }');
                 }
 
-                if (data.role.indexOf('admin') != -1 || data.role.indexOf('admin') != -1) {
-                    $('.user').css({ display: "inline-block" });
+                if (data.role.indexOf('user') != -1) {
+                    SetRules('.admin { display: none; }', '.user { display: inline-block; }');
                 }
             });
 
@@ -265,20 +281,26 @@ function Post() {
             $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
                                     '{' +
                                         '<div>' +
-                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br />' +
+                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br>' +
                                         '{' +
                                              '<div>' + data.text + '</div>' +
                                         '}' +
                                         '</div>' + (function () {
                                             for (var i = 0, out = ''; i < data.comments.length; i++) {
                                                 out += '<br><div>' +
-                                                        '<span class="post-keyword">class</span> <header>Comment</header><br />' +
+                                                        '<span class="post-keyword">class</span> <header>Comment</header><br>' +
                                                         '{' +
                                                             '<div>' + data.comments[i].text + '</div>' +
                                                         '}' +
                                                         '</div>';
                                             } return out;
-                                        })() + '}');
+                                        })() + '<br>' +
+                                        '<div class="user">' +
+                                        '<span class="post-keyword">class</span> <header>New Comment</header><br>' +
+                                        '{' +
+                                        '<input type="text" id="post-comment-editor"/><br>' + 
+                                        '<button id="post-comment-save">Save</button><br>' +
+                                        '}</div>' + '}');
         });
     };
 
