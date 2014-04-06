@@ -1,4 +1,6 @@
 ﻿/// <reference path="jquery-2.1.0.js" />
+/// <reference path="underscore.js" />
+/// <reference path="mustache.js" />
 
 /**
  * Основной класс приложения
@@ -24,11 +26,11 @@ function Application() {
     });
 
     menu.OnNew(function () {
-        tab.Add('New Post', post.NewPostId);
+        tab.Add('New Post', post.NewPostSequence.New());
     });
 
     post.OnPreview(function () {
-        tab.Add('Preview', post.PreviewId);
+        tab.Add('Preview', post.PreviewPostSequence.New());
     });
 
     this.Start = function () {
@@ -46,6 +48,28 @@ function Menu() {
     };
 
     var self = this;
+};
+
+/**
+ * Последовательность уникальных идентификаторов
+ */
+function IdSequence(start) {
+
+    var self = this;
+    var start = start;
+
+    this.New = function () {
+        return start += 1;
+    };
+
+    this.Is = function (id) {
+        if(_.isString(id)) {
+            if(id.indexOf(start.substring(0, 3)) != -1)
+                return true;
+        }
+
+        return false;
+    };
 };
 
 function User() {
@@ -242,43 +266,59 @@ function Tab() {
     };
 };
 
+/**
+ * Представляет коллекцию открытых постов
+ */
 function Post() {
+
+    var self = this;
+    var posts = new Array();
+    var previewCallback = null;
 
     this.OnPreview = function (callback) {
         previewCallback = callback;
     };
 
+    /**
+     * Очищает область постов
+     */
     this.Clear = function () {
-        $('#post-content').empty();
+        $('#post-content > div[data-postid]').css('display', 'none');
     };
+
+    this.NewPostSequence = new IdSequence("NEW00000");
+    this.PreviewPostSequence = new IdSequence("PRW00000");
 
     /**
      * Выводит на экран пост
-     * @param {String} name - имя поста
+     * @param {String} id - уникальный идентификатор поста
      */
     this.Show = function (id) {
 
-        // save post data
-        if ($('#editor').length != 0) {
-            postData.shortTitle = $('#editor input[name="short-title"]').val();
-            postData.title = $('#editor input[name="full-title"]').val();
-            postData.text = $('#editor-area').val();
+        this.Clear();
+
+        if (_.contains(posts, id)) {
+            return $('#post-content > div[data-postid="' + id + '"]').css('display', 'block');
         }
 
-        if (id == this.NewPostId)
-            return this.New();
+        posts.push(id);
 
-        if (id == this.PreviewId) {
+        if (this.NewPostSequence.Is(id)) {
+            return this.New(id);
+        }
+
+        if (this.PreviewPostSequence.Is(id)) {
             if ($('#editor').length == 0) return;
 
-            return this.Preview({
+            return this.Preview(id, {
                 "title": $('#editor input[name="full-title"]').val(),
                 "text": $('#editor-area').val()
             });
         }
 
         $.getJSON("/Blog/Post?id=" + id, function (data) {
-            $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
+            var content = $('<div>', { 'data-postid' : id });
+            content.html('<span class="post-keyword">namespace</span> Blog<br>' +
                                     '{' +
                                         '<div>' +
                                         '<span class="post-keyword">class</span> <header>' + data.title + '</header><br>' +
@@ -297,16 +337,18 @@ function Post() {
                                         })() + '<br>' +
                                         '<div class="user">' +
                                         '<span class="post-keyword">class</span> <header>New Comment</header><br>' +
-                                        '{' +
-                                        '<input type="text" id="post-comment-editor"/><br>' + 
+                                        '{<div>' +
+                                        '<textarea id="post-comment-editor"></textarea><br>' + 
                                         '<button id="post-comment-save">Save</button><br>' +
-                                        '}</div>' + '}');
+                                        '</div>}</div><br>' + '}');
+            $('#post-content').prepend(content);
         });
     };
 
-    this.Preview = function (data) {
+    this.Preview = function (id, data) {
         $.post("/Blog/Preview", data, function (data) {
-            $('#post-content').html('<span class="post-keyword">namespace</span> Blog<br>' +
+            var content = $('<div>', { 'data-postid': id });
+            content.html('<span class="post-keyword">namespace</span> Blog<br>' +
                                     '{' +
                                         '<div>' +
                                         '<span class="post-keyword">class</span> <header>' + data.title + '</header><br />' +
@@ -323,19 +365,23 @@ function Post() {
                                                         '</div>';
                                             } return out;
                                         })() + '}');
+            $('#post-content').prepend(content);
         }, 'json');
     };
 
-    this.New = function () {
-        $('#post-content').html(
+    this.New = function (id) {
+        var content = $('<div>', { 'data-postid': id });
+        content.html(
             '<form id="editor">' +
             'Short title: <input type="text" name="short-title">' +
             'Full title: <input type="text" name="full-title">' +
-            'Post content: <textarea id="editor-area"></textarea>' + 
+            'Post content: <textarea id="editor-area"></textarea>' +
             '</form><br>' +
             '<button id="editor-save">Save</button> ' +
             '<button id="editor-preview">Preview</button>'
           );
+
+        $('#post-content').prepend(content);
 
         $('#editor-save').click(function () {
             $.post("/Blog/SavePost", {
@@ -349,19 +395,7 @@ function Post() {
         });
 
         $('#editor-preview').click(previewCallback);
-
-        // restore data
-        $('#editor input[name="short-title"]').val(postData.shortTitle);
-        $('#editor input[name="full-title"]').val(postData.title);
-        $('#editor-area').val(postData.text);
     };
-
-    this.NewPostId = 99999;
-    this.PreviewId = 99998;
-
-    var previewCallback = null;
-    var postData = { shortTitle: "", title: "", text: "" };
-    var self = this;
 };
 
 /**

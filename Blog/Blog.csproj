@@ -98,6 +98,9 @@
     <None Include="Content\Scripts\jquery-2.1.0.intellisense.js" />
     <Content Include="Content\Scripts\jquery-2.1.0.js" />
     <Content Include="Content\Scripts\jquery-2.1.0.min.js" />
+    <Content Include="Content\Scripts\mustache.js" />
+    <Content Include="Content\Scripts\underscore.js" />
+    <Content Include="Content\Scripts\underscore.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -126,6 +129,7 @@
     <Content Include="Content\Scripts\jquery-2.1.0.min.map" />
     <None Include="Properties\PublishProfiles\mvc5blog - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mvc5blog - Web Deploy.pubxml" />
+    <Content Include="Content\Scripts\underscore.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
