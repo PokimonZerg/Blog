@@ -134,31 +134,20 @@ function User() {
     };
 
     function ShowLoginForm() {
-        var loginForm = $('<div id="login-window"></div>').html(
-                '<div id="login-window-title">Login or Register' +
-                '<div id="login-window-close-button"></div>' +
-                '</div>' +
-                '<form id="login-form">' +
-                'Login: <input type="text" name="login">' +
-                'Password: <input type="text" name="password"></form>' + 
-                '<br><div id="login-buttons">' +
-                '<button class="register-button">Register</button> ' +
-                '<button class="login-button">Login</button>' +
-                '<br><br><br><div id="login-google"></div>' +
-                '<br><div id="login-info-block"></div></div>');
+        $.get("Content/Templates/login.html", function (data) {
+            $('main').prepend(Mustache.render(data, {}));
 
-        loginForm.find('#login-window-close-button').click(function () { $('#login-window').remove(); });
-        loginForm.find('.register-button').click(function () { LoginRequest('Register') });
-        loginForm.find('.login-button').click(function () { LoginRequest('Login') });
+            $('#login-window-close-button').click(function () { $('#login-window').remove(); });
+            $('.register-button').click(function () { LoginRequest('Register') });
+            $('.login-button').click(function () { LoginRequest('Login') });
 
-        $('main').prepend(loginForm);
-
-        gapi.signin.render('login-google', {
-            'clientid': 'CLIENT_ID',
-            'scope': 'https://www.googleapis.com/auth/plus.login',
-            'requestvisibleactions': 'http://schemas.google.com/AddActivity',
-            'cookiepolicy': 'single_host_origin',
-            'callback': 'GoogleCallback'
+            gapi.signin.render('login-google', {
+                'clientid': 'CLIENT_ID',
+                'scope': 'https://www.googleapis.com/auth/plus.login',
+                'requestvisibleactions': 'http://schemas.google.com/AddActivity',
+                'cookiepolicy': 'single_host_origin',
+                'callback': 'GoogleCallback'
+            });
         });
     };
 
@@ -304,97 +293,40 @@ function Post() {
         posts.push(id);
 
         if (this.NewPostSequence.Is(id)) {
-            return this.New(id);
+            return $.get("Content/Templates/editor.html", function (data) {
+                $('#post-content').prepend(Mustache.render(data, { "id": id }));
+
+                $('#editor-save').click(function () {
+                    $.post("/Blog/SavePost", {
+                        "short_title": $('#editor input[name="short-title"]').val(),
+                        "title": $('#editor input[name="full-title"]').val(),
+                        "text": $('#editor-area').val(),
+                        "key": window.localStorage.getItem('key')
+                    }, function (data) {
+                        alert(data.result ? 'Post saved' : 'Error while saving post: ' + data.message)
+                    }, 'json');
+                });
+
+                $('#editor-preview').click(previewCallback);
+            });
         }
 
         if (this.PreviewPostSequence.Is(id)) {
-            if ($('#editor').length == 0) return;
-
-            return this.Preview(id, {
-                "title": $('#editor input[name="full-title"]').val(),
-                "text": $('#editor-area').val()
+            return $.get("Content/Templates/preview.html", function (template) {
+                $('#post-content').prepend(Mustache.render(template, {
+                    "id": id,
+                    "title": $('#editor input[name="full-title"]').val(),
+                    "text": $('#editor-area').val()
+                }));
             });
         }
 
         $.getJSON("/Blog/Post?id=" + id, function (data) {
-            var content = $('<div>', { 'data-postid' : id });
-            content.html('<span class="post-keyword">namespace</span> Blog<br>' +
-                                    '{' +
-                                        '<div>' +
-                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br>' +
-                                        '{' +
-                                             '<div>' + data.text + '</div>' +
-                                        '}' +
-                                        '</div>' + (function () {
-                                            for (var i = 0, out = ''; i < data.comments.length; i++) {
-                                                out += '<br><div>' +
-                                                        '<span class="post-keyword">class</span> <header>Comment</header><br>' +
-                                                        '{' +
-                                                            '<div>' + data.comments[i].text + '</div>' +
-                                                        '}' +
-                                                        '</div>';
-                                            } return out;
-                                        })() + '<br>' +
-                                        '<div class="user">' +
-                                        '<span class="post-keyword">class</span> <header>New Comment</header><br>' +
-                                        '{<div>' +
-                                        '<textarea id="post-comment-editor"></textarea><br>' + 
-                                        '<button id="post-comment-save">Save</button><br>' +
-                                        '</div>}</div><br>' + '}');
-            $('#post-content').prepend(content);
+            $.get("Content/Templates/post.html", function (template) {
+                data.id = id;
+                $('#post-content').prepend(Mustache.render(template, data));
+            });
         });
-    };
-
-    this.Preview = function (id, data) {
-        $.post("/Blog/Preview", data, function (data) {
-            var content = $('<div>', { 'data-postid': id });
-            content.html('<span class="post-keyword">namespace</span> Blog<br>' +
-                                    '{' +
-                                        '<div>' +
-                                        '<span class="post-keyword">class</span> <header>' + data.title + '</header><br />' +
-                                        '{' +
-                                             '<div>' + data.text + '</div>' +
-                                        '}' +
-                                        '</div>' + (function () {
-                                            for (var i = 0, out = ''; i < data.comments.length; i++) {
-                                                out += '<br><div>' +
-                                                        '<span class="post-keyword">class</span> <header>Comment</header><br />' +
-                                                        '{' +
-                                                            '<div>' + data.comments[i].text + '</div>' +
-                                                        '}' +
-                                                        '</div>';
-                                            } return out;
-                                        })() + '}');
-            $('#post-content').prepend(content);
-        }, 'json');
-    };
-
-    this.New = function (id) {
-        var content = $('<div>', { 'data-postid': id });
-        content.html(
-            '<form id="editor">' +
-            'Short title: <input type="text" name="short-title">' +
-            'Full title: <input type="text" name="full-title">' +
-            'Post content: <textarea id="editor-area"></textarea>' +
-            '</form><br>' +
-            '<button id="editor-save">Save</button> ' +
-            '<button id="editor-preview">Preview</button>'
-          );
-
-        $('#post-content').prepend(content);
-
-        $('#editor-save').click(function () {
-            $.post("/Blog/SavePost", {
-                "short_title": $('#editor input[name="short-title"]').val(),
-                "title": $('#editor input[name="full-title"]').val(),
-                "text": $('#editor-area').val(),
-                "key": window.localStorage.getItem('key')
-            }, function (data) {
-                alert(data.result ? 'Post saved' : 'Error while saving post: ' + data.message)
-            }, 'json');
-        });
-
-        $('#editor-preview').click(previewCallback);
     };
 };
 

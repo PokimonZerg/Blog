@@ -92,6 +92,9 @@
     <Content Include="Content\Images\solution.png" />
     <Content Include="Content\Scripts\script.js" />
     <Content Include="Content\Styles\style.css" />
+    <Content Include="Content\Templates\editor.html" />
+    <Content Include="Content\Templates\post.html" />
+    <Content Include="Content\Templates\preview.html" />
     <Content Include="Database\DemoData.sql" />
     <Content Include="Database\Setup.sql" />
     <Content Include="Global.asax" />
@@ -119,7 +122,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Index.cshtml" />
     <Content Include="BlogData.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>
@@ -127,6 +132,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\Scripts\jquery-2.1.0.min.map" />
+    <Content Include="Content\Templates\login.html" />
     <None Include="Properties\PublishProfiles\mvc5blog - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mvc5blog - Web Deploy.pubxml" />
     <Content Include="Content\Scripts\underscore.min.map" />

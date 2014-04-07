@@ -1,0 +1,30 @@
+﻿<div data-postid="{{id}}">
+    <span class="post-keyword">namespace</span> Blog<br>
+    {
+        <div>
+            <span class="post-keyword">class</span> <header>{{title}}</header><br>
+            {
+                <div>{{text}}</div>
+            }
+        </div>
+        {{#comments}}
+        <br>
+        <div>
+            <span class="post-keyword">class</span> <header>Comment</header><br>
+            {
+                <div>{{text}}</div>
+            }
+        </div>
+        {{/comments}}
+        <br>
+        <div class="user">
+            <span class="post-keyword">class</span> <header>New Comment</header><br>
+            {
+                <div>
+                    <textarea id="post-comment-editor"></textarea><br>
+                    <button id="post-comment-save">Save</button><br>
+                </div>
+            }
+        </div><br>
+    }
+</div>
