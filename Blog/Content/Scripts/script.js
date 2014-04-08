@@ -1,5 +1,4 @@
 ﻿/// <reference path="jquery-2.1.0.js" />
-/// <reference path="underscore.js" />
 /// <reference path="mustache.js" />
 
 /**
@@ -8,30 +7,16 @@
 function Application() {
 
     var tree = new Tree();
-    var tab  = new Tab();
     var post = new Post();
     var user = new User();
     var menu = new Menu();
 
     tree.OnSelect(function (name, id) {
-        tab.Add(name, id);
+        post.Add(name, id);
     });
 
-    tab.OnSelect(function (id) {
-        post.Show(id);
-    });
-
-    tab.OnClose(function () {
-        post.Clear();
-    });
-
-    menu.OnNew(function () {
-        tab.Add('New Post', post.NewPostSequence.New());
-    });
-
-    post.OnPreview(function () {
-        tab.Add('Preview', post.PreviewPostSequence.New());
-    });
+    menu.OnNew(post.New);
+    menu.OnLogin(user.Login);
 
     this.Start = function () {
 
@@ -47,28 +32,8 @@ function Menu() {
         $('#new-link').click(callback);
     };
 
-    var self = this;
-};
-
-/**
- * Последовательность уникальных идентификаторов
- */
-function IdSequence(start) {
-
-    var self = this;
-    var start = start;
-
-    this.New = function () {
-        return start += 1;
-    };
-
-    this.Is = function (id) {
-        if(_.isString(id)) {
-            if(id.indexOf(start.substring(0, 3)) != -1)
-                return true;
-        }
-
-        return false;
+    this.OnLogin = function (callback) {
+        $('#login-link').click(callback);
     };
 };
 
@@ -172,88 +137,8 @@ function User() {
         });
     };
 
-    $('#login-link').click(this.Login);
-
     var self = this;
 }
-
-function Tab() {
-
-    this.Add = function (title, id) {
-        var newTab = new Tab(title, id);
-        tabs.push(newTab);
-    };
-
-    this.selectTab = function (title) {
-        for (t in tabs) {
-            if (t.title.indexOf(title) != -1)
-                return activateTab(t);
-        }
-    };
-
-    this.OnSelect = function (callback) {
-        onSelect = callback;
-    };
-
-    this.OnClose = function (callback) {
-        onClose = callback;
-    };
-
-    var tabs = new Array();
-    var activeTab = null;
-    var onSelect = null;
-    var onClose = null;
-
-    function Tab(title, id) {
-        this.title = title;
-        this.id = id;
-
-        this.html = $('<li>', { 'class': 'tab', 'text': title });
-        var close_button = $('<div>', { 'class': 'tab-close' });
-        var self = this;
-
-        this.html.click(function (event) {
-            activateTab(self);
-        });
-
-        close_button.click(function (event) {
-            onClose();
-            RemoveTab(self);
-        });
-
-        this.html.append(close_button);
-        // check for tab panel overflow
-        if ($('#tab-panel').find('li').length > 1) {
-            if ($('#tab-panel li').first().width() * ($('#tab-panel').find('li').length + 1) > $('#tab-panel').width())
-                RemoveTab(tabs[0]);
-        }
-
-        $('#tab-panel').append(this.html);
-
-        activateTab(this);
-    };
-
-    function RemoveTab(tab) {
-        var index = tabs.indexOf(tab);
-        tabs.splice(index, 1);
-        tab.html.remove();
-        activateTab(tabs.length == 0 ? null : tabs[0]);
-    };
-
-    function activateTab(tab) {
-        if(tab == null)
-            return null;
-
-        if (activeTab != null) {
-            activeTab.html.removeClass('tab-selected');
-        }
-
-        tab.html.addClass('tab-selected');
-        activeTab = tab;
-
-        onSelect(tab.id);
-    };
-};
 
 /**
  * Представляет коллекцию открытых постов
@@ -262,39 +147,23 @@ function Post() {
 
     var self = this;
     var posts = new Array();
-    var previewCallback = null;
 
-    this.OnPreview = function (callback) {
-        previewCallback = callback;
+    this.Add = function (title, id) {
+
+        AddPost(id, title, function () {
+            $.getJSON("/Blog/Post?id=" + id, function (data) {
+                $.get("Content/Templates/post.html", function (template) {
+                    data.id = id;
+                    $('#post-content').prepend(Mustache.render(template, data));
+                });
+            });
+        });
     };
 
-    /**
-     * Очищает область постов
-     */
-    this.Clear = function () {
-        $('#post-content > div[data-postid]').css('display', 'none');
-    };
-
-    this.NewPostSequence = new IdSequence("NEW00000");
-    this.PreviewPostSequence = new IdSequence("PRW00000");
-
-    /**
-     * Выводит на экран пост
-     * @param {String} id - уникальный идентификатор поста
-     */
-    this.Show = function (id) {
-
-        this.Clear();
-
-        if (_.contains(posts, id)) {
-            return $('#post-content > div[data-postid="' + id + '"]').css('display', 'block');
-        }
-
-        posts.push(id);
-
-        if (this.NewPostSequence.Is(id)) {
-            return $.get("Content/Templates/editor.html", function (data) {
-                $('#post-content').prepend(Mustache.render(data, { "id": id }));
+    this.New = function () {
+        AddPost("new", "New", function () {
+            $.get("Content/Templates/editor.html", function (data) {
+                $('#post-content').prepend(Mustache.render(data, { "id": "new" }));
 
                 $('#editor-save').click(function () {
                     $.post("/Blog/SavePost", {
@@ -307,26 +176,83 @@ function Post() {
                     }, 'json');
                 });
 
-                $('#editor-preview').click(previewCallback);
+                $('#editor-preview').click(Preview);
             });
-        }
+        });
+    };
 
-        if (this.PreviewPostSequence.Is(id)) {
-            return $.get("Content/Templates/preview.html", function (template) {
+    function Preview() {
+        RemovePost("preview");
+
+        AddPost("preview", "Preview", function () {
+            $.get("Content/Templates/preview.html", function (template) {
                 $('#post-content').prepend(Mustache.render(template, {
-                    "id": id,
+                    "id": "preview",
                     "title": $('#editor input[name="full-title"]').val(),
                     "text": $('#editor-area').val()
                 }));
             });
+        });
+    };
+
+    function AddPost(id, title, content_callback) {
+        // если пост уже был загружен
+        if (posts.indexOf(id) != -1) {
+            return ShowPost(id);
         }
 
-        $.getJSON("/Blog/Post?id=" + id, function (data) {
-            $.get("Content/Templates/post.html", function (template) {
-                data.id = id;
-                $('#post-content').prepend(Mustache.render(template, data));
+        if (IsTabPanelFull()) {
+            // показать сообщение
+        } else {
+            // добавляем пост в общий список
+            posts.push(id);
+            // добавляем содержимое поста на страницу блога
+            content_callback();
+            // добавляем таб с названием поста
+            AddTab(title, id).done(function () {
+                // показываем пост
+                ShowPost(id);
+            });
+        }
+    };
+
+    function IsTabPanelFull() {
+        return false;
+    };
+
+    function AddTab(title, id) {
+        return $.get("Content/Templates/tab.html", function (template) {
+            $('#tab-panel').append(Mustache.render(template, {
+                "title": title,
+                "id": id
+            }));
+
+            $('li[data-postid="' + id + '"]').click(function () {
+                ShowPost(id);
+            });
+
+            $('li[data-postid="' + id + '"] > div').click(function () {
+                RemovePost(id);
             });
         });
+    };
+
+    function ShowPost(id) {
+        $('#tab-panel > .tab-selected').removeClass('tab-selected');
+        $('#tab-panel > li[data-postid="' + id + '"]').addClass('tab-selected');
+        $('#post-content > div[data-postid]').css('display', 'none');
+        $('#post-content > div[data-postid="' + id + '"]').css('display', 'block');
+    };
+
+    function RemovePost(id) {
+        // удаляем пост из списка
+        posts.splice(posts.indexOf(id), 1);
+        // удаляем пост со страницы
+        $('#post-content > div[data-postid="' + id + '"]').remove();
+        $('#tab-panel > li[data-postid="' + id + '"]').remove();
+        // показываем другой пост
+        if ($('#tab-panel > li[data-postid]').length != 0)
+            ShowPost($('#tab-panel > li[data-postid]:first-child').attr('data-postid'));
     };
 };
 
@@ -417,8 +343,6 @@ function Tree() {
 };
 
 $(document).ready(function () {
-
-    var application = new Application();
-
-    application.Start();
+    // запуск приложения
+    new Application().Start();
 });

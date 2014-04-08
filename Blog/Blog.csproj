@@ -95,6 +95,8 @@
     <Content Include="Content\Templates\editor.html" />
     <Content Include="Content\Templates\post.html" />
     <Content Include="Content\Templates\preview.html" />
+    <Content Include="Content\Templates\tab.html" />
+    <Content Include="Content\Templates\tree.html" />
     <Content Include="Database\DemoData.sql" />
     <Content Include="Database\Setup.sql" />
     <Content Include="Global.asax" />
@@ -102,8 +104,6 @@
     <Content Include="Content\Scripts\jquery-2.1.0.js" />
     <Content Include="Content\Scripts\jquery-2.1.0.min.js" />
     <Content Include="Content\Scripts\mustache.js" />
-    <Content Include="Content\Scripts\underscore.js" />
-    <Content Include="Content\Scripts\underscore.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -135,7 +135,6 @@
     <Content Include="Content\Templates\login.html" />
     <None Include="Properties\PublishProfiles\mvc5blog - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\mvc5blog - Web Deploy.pubxml" />
-    <Content Include="Content\Scripts\underscore.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
