@@ -1,1 +1,30 @@
-﻿
+﻿<ul class="tree-container">
+    <li class="tree-node" data-state="expanded">
+        <div class="tree-arrow"></div>
+        <div class="tree-name">
+            <img class="tree-icon" src="content/images/solution.png" />
+            <span>{{name}}</span>
+        </div>
+        {{#child}}
+        <ul class="tree-container">
+            <li class="tree-node" data-state="expanded">
+                <div class="tree-arrow"></div>
+                <div class="tree-name">
+                    <img class="tree-icon" src="content/images/solution.png" />
+                    <span>{{name}}</span>
+                </div>
+                {{#child}}
+                <ul class="tree-container">
+                    <li class="tree-node" data-state="expanded" data-postid="{{id}}">
+                        <div class="tree-name">
+                            <img class="tree-icon" src="content/images/solution.png" />
+                            <span>{{name}}</span>
+                        </div>
+                    </li>
+                </ul>
+                {{/child}}
+            </li>
+        </ul>
+        {{/child}}
+    </li>
+</ul>

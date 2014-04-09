@@ -186,6 +186,8 @@ textarea {
     position: relative;
     padding-left: 16px;
     cursor: default;
+    padding: 0;
+    margin: 0;
 }
 
 .tree-arrow {
@@ -203,11 +205,11 @@ textarea {
     margin-right: 5px;
 }
 
-li[data-state=expanded] ~ ul {
+li[data-state=expanded] > ul {
     display: block;
 }
 
-li[data-state=collapse] ~ ul {
+li[data-state=collapse] > ul {
     display: none;
 }
 
@@ -219,9 +221,31 @@ li[data-state=collapse] > div.tree-arrow {
     background-image: url(../images/collapse.png);
 }
 
+.tree-focus {
+    background-color: #3399FF;
+    color: white;
+}
+
+.tree-focus ul {
+    background-color: white;
+    color: black;
+}
+
 li[data-focus=true] {
     background-color: #3399FF;
     color: white;
+}
+
+#explorer-content li li {
+    padding-left: 16px;
+}
+
+#explorer-content ul ul ul {
+    margin-left: -16px;
+}
+
+#explorer-content li li li {
+    padding-left: 48px;
 }
 
 /*

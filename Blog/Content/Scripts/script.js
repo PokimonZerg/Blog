@@ -265,81 +265,41 @@ function Tree() {
     this.Refresh = function () {
         $.getJSON("/Blog/Tree", function (data) {
             $("#explorer-content").empty();
-            $("#explorer-content").append(BuildRoot(data));
+
+            $.get("Content/Templates/tree.html", function (template) {
+                $("#explorer-content").append(Mustache.render(template, data));
+
+                $('#explorer-content .tree-arrow').click(ExpandNode);
+                $('#explorer-content li').click(ActivateNode);
+                $('#explorer-content li li li').dblclick(OpenPost);
+            });
         });
     };
-    
-    this.Refresh();
-    this.Refresh();
+
+    function ExpandNode(event) {
+        var li = $(this).parent('li');
+        li.attr('data-state', li.attr('data-state') == 'expanded' ? 'collapse' : 'expanded');
+    };
+
+    function ActivateNode(event) {
+        $('#explorer-content .tree-focus').removeClass('tree-focus');
+        $(this).addClass('tree-focus');
+        event.stopPropagation();
+    };
+
+    function OpenPost(event) {
+        onSelect($(this).find('span').text(), $(this).attr('data-postid'));
+        event.stopPropagation();
+    };
 
     this.OnSelect = function (callback) {
         onSelect = callback;
     };
 
     var onSelect = null;
-
     var self = this;
 
     $('#explorer-menu-refresh').click(self.Refresh);
-
-    /**
-     * Собирает корень дерева
-     * @param {Object} data - данные дерева 
-     * @return {Object} - html представление корня дерева
-     */
-    function BuildRoot(data) {
-
-        var root = CreateSection(data.name, 'tree-arrow', 'content/images/solution.png', 0);
-
-        root.css({ 'padding-left': '-10px', 'margin-top': '7px' });
-        data.child.forEach(function (item) {
-            root.append(CreateSection(item.name, 'tree-arrow', 'content/images/solution.png', 16));
-
-            var lastItem = root.find("ul:last");
-
-            item.child.forEach(function (childItem) {
-                var section = CreateSection(childItem.name, null, 'content/images/solution.png', 48);
-
-                section.find('li').dblclick(select_callback);
-                section.find('li').attr('data-post-id', childItem.id);
-
-                lastItem.append(section);
-            });
-        });
-
-        return root;
-    };
-
-    function CreateSection(name, arrow, icon, padding) {
-        var ul = $('<ul>', { 'class': 'tree-container' });
-        var li = $('<li>', { 'class': 'tree-node', 'data-focus': false, 'data-state': 'expanded' });
-        var arrow = $('<div>', { 'class': arrow });
-        var text = $('<span>', { 'text': name });
-        var name = $('<div>', { 'class': 'tree-name' });
-        var pic = $('<img>', { 'class': 'tree-icon', 'src': icon });
-
-        arrow.click(expand_callback);
-        li.click(activate_callback);
-
-        li.css({ 'padding-left': padding + 'px' });
-
-        return ul.append(li.append(arrow).append(name.append(pic).append(text)));
-    }
-
-    function expand_callback(event) {
-        var li = $(event.target).parent('li');
-
-        li.attr('data-state', li.attr('data-state') == 'expanded' ? 'collapse' : 'expanded');
-    };
-
-    function activate_callback(event) {
-        $('#explorer li').attr('data-focus', false);
-        $(this).attr('data-focus', true)
-    };
-
-    function select_callback(event) {
-        onSelect($(this).find('span').text(), $(this).attr('data-post-id'));
-    };
 };
 
 $(document).ready(function () {
