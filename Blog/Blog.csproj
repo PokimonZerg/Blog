@@ -85,11 +85,14 @@
     <Content Include="Content\Images\close.png" />
     <Content Include="Content\Images\collapse.png" />
     <Content Include="Content\Images\expand.png" />
+    <Content Include="Content\Images\folder-active.png" />
+    <Content Include="Content\Images\folder.png" />
     <Content Include="Content\Images\login-close-active.png" />
     <Content Include="Content\Images\login-close.png" />
-    <Content Include="Content\Images\minus.png" />
-    <Content Include="Content\Images\plus.png" />
-    <Content Include="Content\Images\solution.png" />
+    <Content Include="Content\Images\project.png" />
+    <Content Include="Content\Images\refresh-active.png" />
+    <Content Include="Content\Images\refresh.png" />
+    <Content Include="Content\Images\script.png" />
     <Content Include="Content\Scripts\script.js" />
     <Content Include="Content\Styles\style.css" />
     <Content Include="Content\Templates\editor.html" />
