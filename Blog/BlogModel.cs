@@ -41,9 +41,28 @@ namespace Blog
             dataModel.SubmitChanges();
         }
 
+        public void SaveComment(string text, int post, string key)
+        {
+            var author = dataModel.users.First(u => u.key == key).id;
+
+            dataModel.comments.InsertOnSubmit(new comment { author = author, text = text, post = post });
+
+            dataModel.SubmitChanges();
+        }
+
+        public bool IsUserExist(string id)
+        {
+            return dataModel.users.Where(u => u.token.Equals(id)).Count() != 0;
+        }
+
         public bool IsUserExist(string login, string password)
         {
             return dataModel.users.Where(u => u.login.Equals(login) && u.password.Equals(password)).Count() != 0;
+        }
+
+        public string GetUserKey(string id)
+        {
+            return dataModel.users.Where(u => u.token.Equals(id)).First().key;
         }
 
         public string GetUserKey(string login, string password)
@@ -66,14 +85,14 @@ namespace Blog
             return dataModel.users.Where(u => u.key.Equals(key)).Select(f => new UserInfo { Name = f.login, Role = f.role }).First();
         }
 
-        public string AddUser(string login, string password)
+        public string AddUser(string login, string password, string id = null)
         {
             string newKey = Guid.NewGuid().ToString();
 
             dataModel.users.InsertOnSubmit(new user {
-                login = login,
+                login = login.Length > 16 ? login.Substring(0, 16) : login,
                 password = password,
-                token = null,
+                token = id,
                 key = newKey,
                 role = "user" 
             });

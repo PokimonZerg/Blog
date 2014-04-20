@@ -1,12 +1,28 @@
 ﻿<div id="login-window">
 	<div id="login-window-title">Login or Register<div id="login-window-close-button"></div></div>
 	<form id="login-form">
-	Login: <input type="text" name="login">
-	Password: <input type="text" name="password"></form><br>
+	Login: <input type="text" name="login" maxlength="16">
+	Password: <input type="text" name="password" maxlength="16"></form><br>
 	<div id="login-buttons">
 		<button class="register-button">Register</button>
 		<button class="login-button">Login</button><br><br><br>
-		<div id="login-google"></div><br>
+        <span id="signinButton">
+            <span class="g-signin"
+                  data-callback="GoogleSignInCallback"
+                  data-clientid="327743835065-2rd182f7rmidvhaopqahqhr9047mirk0.apps.googleusercontent.com"
+                  data-cookiepolicy="single_host_origin"
+                  data-requestvisibleactions="http://schemas.google.com/AddActivity"
+                  data-scope="https://www.googleapis.com/auth/plus.login">
+            </span>
+        </span><br>
 		<div id="login-info-block"></div>
 	</div>
 </div>
+
+<script type="text/javascript">
+    (function () {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/client:plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+</script>

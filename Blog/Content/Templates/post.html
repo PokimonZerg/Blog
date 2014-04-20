@@ -4,7 +4,7 @@
         <div>
             <span class="post-keyword">class</span> <header>{{title}}</header><br>
             {
-                <div>{{text}}</div>
+                <div>{{{text}}}</div>
             }
         </div>
         {{#comments}}
@@ -12,19 +12,18 @@
         <div>
             <span class="post-keyword">class</span> <header>Comment</header><br>
             {
-                <div>{{text}}</div>
+                <div>{{{text}}}</div>
             }
         </div>
         {{/comments}}
-        <br>
-        <div class="user">
+        <div class="user"><br>
             <span class="post-keyword">class</span> <header>New Comment</header><br>
             {
                 <div>
-                    <textarea id="post-comment-editor"></textarea><br>
-                    <button id="post-comment-save">Save</button><br>
+                    <textarea class="post-comment-editor" maxlength="2000"></textarea><br>
+                    <button class="post-comment-save">Save</button><br>
                 </div>
             }
-        </div><br>
+        </div><br class="user">
     }
 </div>

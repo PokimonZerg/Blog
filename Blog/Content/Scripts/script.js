@@ -6,23 +6,26 @@
  */
 function Application() {
 
-    var tree = new Tree();
-    var post = new Post();
-    var user = new User();
-    var menu = new Menu();
+    var self = this;
 
-    tree.OnSelect(function (name, id) {
-        post.Add(name, id);
+    this.tree = new Tree();
+    this.post = new Post();
+    this.user = new User();
+    this.menu = new Menu();
+    this.status = new Status();
+
+    this.tree.OnSelect(function (name, id) {
+        self.post.Add(name, id);
     });
 
-    menu.OnNew(post.New);
-    menu.OnLogin(user.Login);
+    this.menu.OnNew(this.post.New);
+    this.menu.OnLogin(this.user.Login);
 
     this.Start = function () {
 
-        tree.Refresh();
+        self.tree.Refresh();
 
-        user.Authorize();
+        self.user.Authorize();
     };
 };
 
@@ -37,14 +40,25 @@ function Menu() {
     };
 };
 
+function Status() {
+    var self = this;
+
+    this.Set = function (text) {
+        $('#statusbar').text(text);
+    };
+};
+
 function User() {
 
     this.Login = function () {
 
         if ($('#login-link').text().indexOf('USER') != -1) {
             window.localStorage.removeItem('key');
+            if(typeof gapi != undefined)
+                gapi.auth.signOut();
             $('#login-link').text('LOGIN');
-            return self.Authorize(null);
+            self.Authorize();
+            return application.status.Set("Logout current user");
         }
 
         if (!self.Authorize())
@@ -103,28 +117,16 @@ function User() {
             $('main').prepend(Mustache.render(data, {}));
 
             $('#login-window-close-button').click(function () { $('#login-window').remove(); });
-            $('.register-button').click(function () { LoginRequest('Register') });
-            $('.login-button').click(function () { LoginRequest('Login') });
-
-            gapi.signin.render('login-google', {
-                'clientid': 'CLIENT_ID',
-                'scope': 'https://www.googleapis.com/auth/plus.login',
-                'requestvisibleactions': 'http://schemas.google.com/AddActivity',
-                'cookiepolicy': 'single_host_origin',
-                'callback': 'GoogleCallback'
-            });
+            $('.register-button').click(function () { application.user.LoginRequest('Register') });
+            $('.login-button').click(function () { application.user.LoginRequest('Login') });
         });
     };
 
-    function GoogleCallback(authResult) {
-        var g = 0;
-    };
-
-    function LoginRequest(target) {
-        $.getJSON('/Blog/' + target, {
+    this.LoginRequest = function (target, values) {
+        $.getJSON('/Blog/' + target, (typeof values === 'undefined') ? {
             "login": $('#login-form > input[name="login"]').val(),
             "password": $('#login-form > input[name="password"]').val()
-        },
+        } : values,
         function (data) {
 
             if (!data.result)
@@ -155,9 +157,30 @@ function Post() {
                 $.get("Content/Templates/post.html", function (template) {
                     data.id = id;
                     $('#post-content').prepend(Mustache.render(template, data));
+
+                    $('div[data-postid="' + id + '"] .post-comment-save').click(function (event) {
+                        var postid = $('div[data-postid]:visible').attr('data-postid');
+                        var text = $('.post-comment-editor:visible').val();
+                        $.post("/Blog/SaveComment", {
+                            "text": text,
+                            "post": postid,
+                            "key": window.localStorage.getItem('key')
+                        }, function (data) {
+                            if (data.result == true) {
+                                var title = $('.tab[data-postid="' + postid + '"]').text();
+                                RemovePost(postid);
+                                self.Add(title, postid);
+                                application.status.Set("Comment saved");
+                            } else {
+                                application.status.Set("Error while saving comment: " + data.message);
+                            }
+                        });
+                    });
                 });
             });
         });
+
+        application.status.Set("Open post '" + title + "'");
     };
 
     this.New = function () {
@@ -172,7 +195,7 @@ function Post() {
                         "text": $('#editor-area').val(),
                         "key": window.localStorage.getItem('key')
                     }, function (data) {
-                        alert(data.result ? 'Post saved' : 'Error while saving post: ' + data.message)
+                        application.status.Set(data.result ? "Post saved" : "Error while saving post: " + data.message);
                     }, 'json');
                 });
 
@@ -193,6 +216,8 @@ function Post() {
                 }));
             });
         });
+
+        application.status.Set("Preview post");
     };
 
     function AddPost(id, title, content_callback) {
@@ -302,7 +327,30 @@ function Tree() {
     $('#explorer-menu-refresh').click(self.Refresh);
 };
 
+var application = null;
+
 $(document).ready(function () {
     // запуск приложения
-    new Application().Start();
+    application = new Application();
+    application.Start();
 });
+
+function GoogleSignInCallback(authResult) {
+    if (authResult['access_token']) {
+        gapi.auth.setToken(authResult);
+        gapi.client.load('oauth2', 'v2', function () {
+            var request = gapi.client.oauth2.userinfo.get();
+            request.execute(function (data) {
+                if (data['id']) {
+                    application.user.LoginRequest('Google', {
+                        "name": data["name"],
+                        "id": data["id"]
+                    });
+                    application.status.Set("Google login success. User: " + data["name"]);
+                } else {
+                    application.status.Set("Google login fail");
+                }
+            });
+        });
+    }
+};

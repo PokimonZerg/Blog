@@ -37,6 +37,7 @@ namespace Blog
         }
 
         [HttpGet]
+        [OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)]
         public JsonResult Post(int id)
         {
             var post = blogModel.GetPostContent(id);
@@ -62,7 +63,7 @@ namespace Blog
             try
             {
                 blogModel.CheckUserRole(new[] { "admin" }, key);
-                blogModel.SavePost(short_title, title, text);
+                blogModel.SavePost(short_title, title, PrepareText(text));
             }
             catch(Exception e)
             {
@@ -70,6 +71,44 @@ namespace Blog
             }
 
             return Json(new { result = true, message = "" });
+        }
+
+        [HttpPost]
+        public JsonResult SaveComment(string text, int post, string key)
+        {
+            try
+            {
+                blogModel.CheckUserRole(new[] { "user", "admin" }, key);
+                blogModel.SaveComment(PrepareText(text), post, key);
+            }
+            catch (Exception e)
+            {
+                return Json(new { result = false, message = e.Message });
+            }
+
+            return Json(new { result = true, message = "" });
+        }
+
+        [HttpGet]
+        public JsonResult Google(string name, string id)
+        {
+            try
+            {
+                if (blogModel.IsUserExist(id))
+                {
+                    return Json(new LoginInfo(true, blogModel.GetUserKey(id), ""), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    string key = blogModel.AddUser(name, null, id);
+
+                    return Json(new LoginInfo(true, key, ""), JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception e)
+            {
+                return Json(new LoginInfo(false, "", "Fatal error: " + e.Message), JsonRequestBehavior.AllowGet);
+            }
         }
 
         [HttpGet]
@@ -120,6 +159,14 @@ namespace Blog
             var userInfo = blogModel.GetUserInfo(key);
 
             return Json(new { name = userInfo.Name, role = userInfo.Role }, JsonRequestBehavior.AllowGet);
+        }
+
+        private string PrepareText(string text)
+        {
+            text = text.Replace("\r\n", "<br>");
+            text = text.Replace("\n", "<br>");
+
+            return text;
         }
 
         private BlogModel blogModel = new BlogModel();
