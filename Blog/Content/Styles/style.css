@@ -365,7 +365,7 @@ li[data-focus=true] {
 #statusbar {
     background-color: #CA5100;
     color: white;
-    padding: 2px;
+    padding: 2px 2px 2px 5px;
     height: 24px;
     line-height: 24px;
     flex-basis: 100%;

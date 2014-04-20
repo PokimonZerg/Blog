@@ -297,8 +297,17 @@ function Tree() {
                 $('#explorer-content .tree-arrow').click(ExpandNode);
                 $('#explorer-content li').click(ActivateNode);
                 $('#explorer-content li li li').dblclick(OpenPost);
+            }).done(function () {
+                ChoosePost(decodeURIComponent((location.search.match(RegExp('[?|&]post=(.+?)(&|$)')) || [, null])[1]));
             });
         });
+    };
+
+    function ChoosePost (post) {
+        if (post != 'null') {
+            $('#explorer-content li[data-postid="' + post + '"]').addClass('tree-focus');
+            onSelect($('#explorer-content li[data-postid="' + post + '"] span').text(), post);
+        }
     };
 
     function ExpandNode(event) {
